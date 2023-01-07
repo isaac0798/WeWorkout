@@ -1,0 +1,12 @@
+scalar Date
+type Query {
+  info: String!
+  allUsers: [Users]
+}
+
+type Users {
+  id: Int
+  createdAt: Date
+  firstname: String
+  surname: String
+}
