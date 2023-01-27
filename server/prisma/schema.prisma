@@ -11,11 +11,20 @@ generator client {
 }
 
 model User {
-  id  Int @id @default(autoincrement())
-  joined DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  joined    DateTime @default(now())
   firstname String
-  lastname String
-  username String @unique
-  email String @unique
-  password String
+  lastname  String
+  username  String   @unique
+  email     String   @unique
+  password  String
+  Team      Team[]
+}
+
+model Team {
+  id       Int      @id @default(autoincrement())
+  joined   DateTime @default(now())
+  teamname String
+  owner    User     @relation(fields: [ownerId], references: [id])
+  ownerId  Int
 }
