@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { UserToken } from '../types/token';
 import { verifyRequest } from '../utilities/verifyRequest';
 const saltRounds = 10;
@@ -15,7 +14,7 @@ const token_secret = process.env.TOKEN_SECRET || '';
 
 dotenv.config();
 
-teamController.get('/create', async (req: Request, res: Response) => {
+teamController.post('/create', async (req: Request, res: Response) => {
   const token = verifyRequest(req, res);
 
   if (!token) {
@@ -37,9 +36,24 @@ teamController.get('/create', async (req: Request, res: Response) => {
   }
 
   bcrypt.hash(body.password, saltRounds, async function(err, hash) {
-    const team = await prisma.team.create({
+    const user = await prisma.user.update({
+      where: {
+        id: token.user_id
+      },
+      data: {
+        Team: {
+          create: {
+            teamname: body.teamname,
+            password: hash
+          }
+        }
+      },
+      include: {
+        Team: true
+      }
+    });
 
-    })
+   res.json(user); 
   })
 })
 

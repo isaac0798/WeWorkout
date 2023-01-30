@@ -25,6 +25,7 @@ model Team {
   id       Int      @id @default(autoincrement())
   joined   DateTime @default(now())
   teamname String
+  password String
   owner    User     @relation(fields: [ownerId], references: [id])
   ownerId  Int
 }

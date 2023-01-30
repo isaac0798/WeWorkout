@@ -17,7 +17,8 @@ export const verifyRequest = (req: Request, res: Response): UserToken | void => 
 
   try {
     const decodedToken = jwt.verify(authToken, token_secret) as UserToken
-    res.json(decodedToken)
+    
+    return decodedToken;
   } catch (err) {
     res.status(403).json(err)
   }

@@ -23,7 +23,7 @@ const prisma = new client_1.PrismaClient();
 const teamController = (0, express_1.Router)();
 const token_secret = process.env.TOKEN_SECRET || '';
 dotenv_1.default.config();
-teamController.get('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+teamController.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = (0, verifyRequest_1.verifyRequest)(req, res);
     if (!token) {
         res.status(403).json('No auth token found');
@@ -40,7 +40,23 @@ teamController.get('/create', (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
     bcrypt_1.default.hash(body.password, saltRounds, function (err, hash) {
         return __awaiter(this, void 0, void 0, function* () {
-            const team = yield prisma.team.create({});
+            const user = yield prisma.user.update({
+                where: {
+                    id: token.user_id
+                },
+                data: {
+                    Team: {
+                        create: {
+                            teamname: body.teamname,
+                            password: hash
+                        }
+                    }
+                },
+                include: {
+                    Team: true
+                }
+            });
+            res.json(user);
         });
     });
 }));

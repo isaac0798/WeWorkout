@@ -16,7 +16,7 @@ const verifyRequest = (req, res) => {
     }
     try {
         const decodedToken = jsonwebtoken_1.default.verify(authToken, token_secret);
-        res.json(decodedToken);
+        return decodedToken;
     }
     catch (err) {
         res.status(403).json(err);
