@@ -13,16 +13,6 @@ const userController = Router();
 dotenv.config();
 const token_secret = process.env.TOKEN_SECRET || '';
 
-async function verifyRequest(req: Request) {
-  const authToken = req.get('Authorization');
-
-  if (!authToken) {
-    return ['', ]  
-  }
-
-  const decodedToken = jwt.verify(authToken, token_secret) as any
-  console.dir(decodedToken, {depth: null});
-}
 
 userController.get('/users', async (req: Request, res: Response) => {
   const users = await prisma.user.findMany()

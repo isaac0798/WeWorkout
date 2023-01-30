@@ -23,16 +23,6 @@ const prisma = new client_1.PrismaClient();
 const userController = (0, express_1.Router)();
 dotenv_1.default.config();
 const token_secret = process.env.TOKEN_SECRET || '';
-function verifyRequest(req) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const authToken = req.get('Authorization');
-        if (!authToken) {
-            return ['',];
-        }
-        const decodedToken = jsonwebtoken_1.default.verify(authToken, token_secret);
-        console.dir(decodedToken, { depth: null });
-    });
-}
 userController.get('/users', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield prisma.user.findMany();
     res.send(users);
