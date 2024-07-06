@@ -51,7 +51,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 	if (error || !data) {
 		return {
 			redirect: {
-				destination: '/',
+				destination: '/login',
 				permanent: false,
 			},
 		}

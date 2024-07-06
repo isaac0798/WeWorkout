@@ -11,12 +11,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 	const supabase = createClient(context)
 
 	const { data, error } = await supabase.auth.getUser()
-  console.log(error);
+	console.log(error)
 
 	if (error || !data) {
 		return {
 			redirect: {
-				destination: '/',
+				destination: '/login',
 				permanent: false,
 			},
 		}

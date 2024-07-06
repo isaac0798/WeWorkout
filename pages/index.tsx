@@ -6,7 +6,7 @@ import { createClient } from '@/utils/supabase/server-props'
 import Page from '@/components/page'
 import Section from '@/components/section'
 
-const Index = ({user}: {user: User}) => (
+const Index = ({ user }: { user: User }) => (
 	<Page>
 		<Section>
 			<h1>Hello, {user.email || 'user'}!</h1>
@@ -48,7 +48,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 	if (error || !data) {
 		return {
 			redirect: {
-				destination: '/',
+				destination: '/login',
 				permanent: false,
 			},
 		}
