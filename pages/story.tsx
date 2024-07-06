@@ -1,10 +1,14 @@
+import type { User } from '@supabase/supabase-js'
+import type { GetServerSidePropsContext } from 'next'
+import { createClient } from '@/utils/supabase/server-props'
 import Page from '@/components/page'
 import Section from '@/components/section'
 
-const Story = () => (
+const Story = ({ user }: { user: User }) => (
 	<Page>
 		<Section>
 			<h2 className='text-xl font-semibold'>Story</h2>
+			<h1>Hello, {user.email || 'user'}!</h1>
 
 			<div className='mt-2'>
 				<p className='text-zinc-600 dark:text-zinc-400'>
@@ -25,5 +29,27 @@ const Story = () => (
 		</Section>
 	</Page>
 )
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+	const supabase = createClient(context)
+
+	const { data, error } = await supabase.auth.getUser()
+	console.log(error)
+
+	if (error || !data) {
+		return {
+			redirect: {
+				destination: '/',
+				permanent: false,
+			},
+		}
+	}
+
+	return {
+		props: {
+			user: data.user,
+		},
+	}
+}
 
 export default Story

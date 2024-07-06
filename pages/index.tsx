@@ -1,9 +1,15 @@
+import type { User } from '@supabase/supabase-js'
+import type { GetServerSidePropsContext } from 'next'
+
+import { createClient } from '@/utils/supabase/server-props'
+
 import Page from '@/components/page'
 import Section from '@/components/section'
 
-const Index = () => (
+const Index = ({user}: {user: User}) => (
 	<Page>
 		<Section>
+			<h1>Hello, {user.email || 'user'}!</h1>
 			<h2 className='text-xl font-semibold text-zinc-800 dark:text-zinc-200'>
 				We grow a lot of rice.
 			</h2>
@@ -32,5 +38,27 @@ const Index = () => (
 		</Section>
 	</Page>
 )
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+	const supabase = createClient(context)
+
+	const { data, error } = await supabase.auth.getUser()
+	console.log(error)
+
+	if (error || !data) {
+		return {
+			redirect: {
+				destination: '/',
+				permanent: false,
+			},
+		}
+	}
+
+	return {
+		props: {
+			user: data.user,
+		},
+	}
+}
 
 export default Index
