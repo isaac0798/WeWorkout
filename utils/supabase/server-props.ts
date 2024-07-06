@@ -1,5 +1,9 @@
 import { type GetServerSidePropsContext } from 'next'
-import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
+import {
+	createServerClient,
+	serializeCookieHeader,
+	type CookieOptions,
+} from '@supabase/ssr'
 
 export function createClient({ req, res }: GetServerSidePropsContext) {
 	const supabase = createServerClient(
@@ -10,7 +14,7 @@ export function createClient({ req, res }: GetServerSidePropsContext) {
 				getAll() {
 					return Object.keys(req.cookies).map((name) => ({
 						name,
-						value: req.cookies[name],
+						value: req.cookies[name] || '',
 					}))
 				},
 				setAll(cookiesToSet) {

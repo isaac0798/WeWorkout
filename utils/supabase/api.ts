@@ -17,7 +17,7 @@ export default function createClient(
 				getAll() {
 					return Object.keys(req.cookies).map((name) => ({
 						name,
-						value: req.cookies[name],
+						value: req.cookies[name] || '',
 					}))
 				},
 				setAll(cookiesToSet) {
