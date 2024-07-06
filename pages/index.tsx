@@ -15,13 +15,16 @@ const Index = ({ user }: { user: User }) => {
 		<Page>
 			<Section>
 				<h1>Hello, {user.email || 'user'}!</h1>
-				return (
 				<Calendar
 					mode='single'
 					selected={date}
 					onSelect={setDate}
 					className='rounded-md border'
 				/>
+				{date?.toDateString()}
+			</Section>
+			<Section>
+				Dump workout text here
 			</Section>
 		</Page>
 	)
@@ -31,7 +34,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 	const supabase = createClient(context)
 
 	const { data, error } = await supabase.auth.getUser()
-	console.log(error)
 
 	if (error || !data) {
 		return {
