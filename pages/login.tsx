@@ -9,11 +9,13 @@ export default function LoginPage() {
 
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
 
 	async function logIn() {
 		const { error } = await supabase.auth.signInWithPassword({
 			email,
-			password,
+			password
 		})
 		if (error) {
 			console.error(error)
@@ -22,7 +24,16 @@ export default function LoginPage() {
 	}
 
 	async function signUp() {
-		const { error } = await supabase.auth.signUp({ email, password })
+		const { error } = await supabase.auth.signUp({
+			email,
+			password,
+			options: {
+				data: {
+					first_name: firstName,
+					last_name: lastName,
+				},
+			},
+		})
 		if (error) {
 			console.error(error)
 		}
@@ -31,7 +42,21 @@ export default function LoginPage() {
 
 	return (
 		<main>
-			<form>
+			<form className='flex flex-col'>
+				<label htmlFor='firstname'>first name:</label>
+				<input
+					id='firstName'
+					type='string'
+					value={firstName}
+					onChange={(e) => setFirstName(e.target.value)}
+				/>
+				<label htmlFor='lastname'>lastname:</label>
+				<input
+					id='lastName'
+					type='string'
+					value={lastName}
+					onChange={(e) => setLastName(e.target.value)}
+				/>
 				<label htmlFor='email'>Email:</label>
 				<input
 					id='email'
