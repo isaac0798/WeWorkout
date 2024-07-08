@@ -6,10 +6,10 @@ import { createClient } from '@/utils/supabase/server-props'
 import { Calendar } from '@/components/ui/calendar'
 import Page from '@/components/page'
 import Section from '@/components/section'
+import { Textarea } from '@/components/ui/textarea'
 
 const Index = ({ user }: { user: User }) => {
 	const [date, setDate] = useState<Date | undefined>(new Date())
-	console.log(date)
 
 	return (
 		<Page>
@@ -21,10 +21,11 @@ const Index = ({ user }: { user: User }) => {
 					onSelect={setDate}
 					className='rounded-md border'
 				/>
-				{date?.toDateString()}
 			</Section>
 			<Section>
-				Dump workout text here
+				<Textarea
+					value={`this is my workout area for ${date?.toDateString()}`}
+				/>
 			</Section>
 		</Page>
 	)
