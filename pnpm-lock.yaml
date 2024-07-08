@@ -33,6 +33,7 @@ specifiers:
   tailwindcss-animate: ^1.0.7
   tailwindcss-safe-area: ^0.4.1
   typescript: ^5.2.2
+  use-debounce: ^10.0.1
   zod: ^3.23.8
 
 dependencies:
@@ -56,6 +57,7 @@ dependencies:
   react-hook-form: 7.52.1_react@18.2.0
   tailwind-merge: 2.3.0
   tailwindcss-animate: 1.0.7_tailwindcss@3.4.4
+  use-debounce: 10.0.1_react@18.2.0
   zod: 3.23.8
 
 devDependencies:
@@ -5278,6 +5280,15 @@ packages:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
     dependencies:
       punycode: 2.3.1
+
+  /use-debounce/10.0.1_react@18.2.0:
+    resolution: {integrity: sha512-0uUXjOfm44e6z4LZ/woZvkM8FwV1wiuoB6xnrrOmeAEjRDDzTLQNRFtYHvqUsJdrz1X37j0rVGIVp144GLHGKg==}
+    engines: {node: '>= 16.0.0'}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
