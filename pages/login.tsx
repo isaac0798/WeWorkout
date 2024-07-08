@@ -1,83 +1,112 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { useForm } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-
 import { createClient } from '@/utils/supabase/component'
 
-export default function LoginPage() {
-	const router = useRouter()
-	const supabase = createClient()
+const loginSchema = z.object({
+	email: z.string().email({ message: 'Please enter a valid email address.' }),
+	password: z.string().min(1, { message: 'Password is required.' }),
+})
 
-	const [email, setEmail] = useState('')
-	const [password, setPassword] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+export default function LoginForm() {
+  	const router = useRouter()
+		const supabase = createClient()
 
-	async function logIn() {
-		const { error } = await supabase.auth.signInWithPassword({
-			email,
-			password
-		})
-		if (error) {
-			console.error(error)
-		}
-		router.push('/')
-	}
+	const form = useForm<z.infer<typeof loginSchema>>({
+		resolver: zodResolver(loginSchema),
+		defaultValues: {
+			email: '',
+			password: '',
+		},
+	})
 
-	async function signUp() {
-		const { error } = await supabase.auth.signUp({
-			email,
-			password,
-			options: {
-				data: {
-					first_name: firstName,
-					last_name: lastName,
-				},
-			},
-		})
-		if (error) {
-			console.error(error)
-		}
-		router.push('/')
+	async function onSubmit(values: z.infer<typeof loginSchema>) {
+		console.log(values)
+    const { error } = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    })
+    if (error) {
+      console.error(error)
+    }
+    router.push('/')
 	}
 
 	return (
-		<main>
-			<form className='flex flex-col'>
-				<label htmlFor='firstname'>first name:</label>
-				<input
-					id='firstName'
-					type='string'
-					value={firstName}
-					onChange={(e) => setFirstName(e.target.value)}
-				/>
-				<label htmlFor='lastname'>lastname:</label>
-				<input
-					id='lastName'
-					type='string'
-					value={lastName}
-					onChange={(e) => setLastName(e.target.value)}
-				/>
-				<label htmlFor='email'>Email:</label>
-				<input
-					id='email'
-					type='email'
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-				/>
-				<label htmlFor='password'>Password:</label>
-				<input
-					id='password'
-					type='password'
-					value={password}
-					onChange={(e) => setPassword(e.target.value)}
-				/>
-				<button type='button' onClick={logIn}>
-					Log in
-				</button>
-				<button type='button' onClick={signUp}>
-					Sign up
-				</button>
-			</form>
-		</main>
+		<div className='min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8'>
+			<div className='sm:mx-auto sm:w-full sm:max-w-md'>
+				<h2 className='mt-6 text-center text-3xl font-extrabold text-white'>
+					Log in to your account
+				</h2>
+			</div>
+
+			<div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
+				<div className='bg-gray-900 py-8 px-4 shadow sm:rounded-lg sm:px-10'>
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+							<FormField
+								control={form.control}
+								name='email'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className='block text-sm font-medium text-gray-200'>
+											Email address
+										</FormLabel>
+										<FormControl>
+											<Input
+												type='email'
+												className='mt-1 block w-full border border-gray-600 rounded-md shadow-sm py-2 px-3 bg-gray-800 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm'
+												placeholder='you@example.com'
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage className='mt-2 text-sm text-red-400' />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='password'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className='block text-sm font-medium text-gray-200'>
+											Password
+										</FormLabel>
+										<FormControl>
+											<Input
+												type='password'
+												className='mt-1 block w-full border border-gray-600 rounded-md shadow-sm py-2 px-3 bg-gray-800 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm'
+												placeholder='********'
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage className='mt-2 text-sm text-red-400' />
+									</FormItem>
+								)}
+							/>
+							<div>
+								<Button
+									type='submit'
+									className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-cyan-400 hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-400'
+								>
+									Log in
+								</Button>
+							</div>
+						</form>
+					</Form>
+				</div>
+			</div>
+		</div>
 	)
 }
