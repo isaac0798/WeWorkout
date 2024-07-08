@@ -11,10 +11,37 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { useEffect } from 'react'
 
-const Index = ({ user, workout }: { user: User, workout: any}) => {
+const Index = ({ user }: { user: User}) => {
 	const supabase = createFEClient()
 	const [date, setDate] = useState<Date | undefined>(new Date())
-	const [workoutDescription, setWorkoutDescription] = useState(workout.description || 'yo')
+	const [workout, setWorkout] = useState<any>();
+	const [value, setValue] = useState('')
+
+	useEffect(() => {
+		async function getWorkoutForDate() {
+				const existingWorkout = await supabase
+					.from('Workouts')
+					.select()
+					.eq('user_id', user.id)
+					.eq('date', date?.toDateString())
+
+				if (existingWorkout.data?.length) {
+						setWorkout(existingWorkout.data[0])
+						setValue(existingWorkout.data[0].description)
+				} else {
+						setWorkout({
+							user_id: user.id,
+							name: 'this is a workout',
+							date: date?.toDateString(),
+							description: '',
+						})
+
+						setValue('')
+				}
+		}
+
+		getWorkoutForDate()
+	}, [date])
 
 	useEffect(() => {
 		async function saveWorkout() {
@@ -29,21 +56,21 @@ const Index = ({ user, workout }: { user: User, workout: any}) => {
 						user_id: user.id,
 						name: 'this is a workout',
 						date: date?.toDateString(),
-						description: workoutDescription,
+						description: value,
 					})
 			}
 
 			const { error } = await supabase
 				.from('Workouts')
 				.update({
-					description: workoutDescription,
+					description: value,
 				})
 				.eq('user_id', user.id)
 				.eq('date', date?.toDateString())
 		}
 
 		saveWorkout();
-	}, [workoutDescription])
+	}, [value])
 
 	return (
 		<Page>
@@ -57,10 +84,11 @@ const Index = ({ user, workout }: { user: User, workout: any}) => {
 			</Section>
 			<Section>
 				<Textarea
-					value={workoutDescription}
+					value={value}
+					placeholder='yooo add something'
 					onChange={(e) => {
 						console.log(e.target.value)
-						setWorkoutDescription(e.target.value)
+						setValue(e.target.value)
 					}}
 				/>
 			</Section>
