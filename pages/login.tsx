@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/router'
-import { createClient } from '@/utils/supabase/component'
+import { createFEClient } from '@/utils/supabase/component'
 
 const loginSchema = z.object({
 	email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -21,7 +21,7 @@ const loginSchema = z.object({
 
 export default function LoginForm() {
   	const router = useRouter()
-		const supabase = createClient()
+		const supabase = createFEClient()
 
 	const form = useForm<z.infer<typeof loginSchema>>({
 		resolver: zodResolver(loginSchema),

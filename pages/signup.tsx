@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 
 
-import { createClient } from '@/utils/supabase/component'
+import { createFEClient } from '@/utils/supabase/component'
 
 const formSchema = z.object({
 	firstName: z.string().min(2, {
@@ -41,7 +41,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
 	const router = useRouter()
-	const supabase = createClient()
+	const supabase = createFEClient()
 
   const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
