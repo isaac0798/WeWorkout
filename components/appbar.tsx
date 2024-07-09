@@ -15,7 +15,7 @@ const Appbar = () => {
 					<nav className='flex items-center space-x-6'>
 						<div className='hidden sm:block'>
 							<div className='flex items-center space-x-6'>
-{/* 								{links.map(({ label, href }) => (
+								{/* 								{links.map(({ label, href }) => (
 									<Link
 										key={label}
 										href={href}
@@ -26,8 +26,8 @@ const Appbar = () => {
 										}`}
 									>
 										{label}
-									</Link> */}
-								))}
+									</Link>
+								))} */}
 							</div>
 						</div>
 					</nav>
