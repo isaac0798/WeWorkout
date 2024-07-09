@@ -9,41 +9,74 @@ import Page from '@/components/page'
 import Section from '@/components/section'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { useEffect } from 'react'
 
-const Index = ({ user }: { user: User}) => {
+import { useEffect } from 'react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+
+const fakeData: WorkoutData = {
+	name: 'Chest Day',
+	date: 'Tue Jul 09 2024',
+	exercises: [
+		{
+			name: 'Bench',
+			exercise: 'exercise_id',
+			sets: [
+				{
+					weight: 100,
+					unit: 'kg',
+					reps: 5,
+				},
+				{
+					weight: 100,
+					unit: 'unit_id',
+					reps: 3,
+				},
+			],
+		},
+	],
+}
+
+type WorkoutData = {
+	name: string
+	date: string
+	exercises: {
+		name: string
+		exercise: string
+		sets: ExerciseSet[]
+	}[]
+}
+
+type ExerciseSet = {
+	weight: number
+	unit: string
+	reps: number
+}
+
+const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient()
 	const [date, setDate] = useState<Date | undefined>(new Date())
-	const [workout, setWorkout] = useState<any>();
-	const [value, setValue] = useState('')
+	const [workout, setWorkout] = useState<any>()
 
 	useEffect(() => {
 		async function getWorkoutForDate() {
-				const existingWorkout = await supabase
-					.from('Workouts')
-					.select()
-					.eq('user_id', user.id)
-					.eq('date', date?.toDateString())
+			const existingWorkout = await supabase
+				.from('Workouts')
+				.select()
+				.eq('user_id', user.id)
+				.eq('date', date?.toDateString())
 
-				if (existingWorkout.data?.length) {
-						setWorkout(existingWorkout.data[0])
-						setValue(existingWorkout.data[0].description)
-				} else {
-						setWorkout({
-							user_id: user.id,
-							name: 'this is a workout',
-							date: date?.toDateString(),
-							description: '',
-						})
-
-						setValue('')
-				}
+			if (existingWorkout.data?.length) {
+				setWorkout(fakeData)
+			} else {
+				setWorkout(fakeData)
+			}
 		}
 
 		getWorkoutForDate()
-	}, [date])
+	}, [])
 
-	useEffect(() => {
+	/* useEffect(() => {
 		async function saveWorkout() {
 			const existingWorkout = await supabase.from('Workouts').select().eq('user_id', user.id).eq('date', date?.toDateString());
 
@@ -70,7 +103,7 @@ const Index = ({ user }: { user: User}) => {
 		}
 
 		saveWorkout();
-	}, [value])
+	}, [value]) */
 
 	return (
 		<Page>
@@ -83,15 +116,36 @@ const Index = ({ user }: { user: User}) => {
 				/>
 			</Section>
 			<Section>
-				<Textarea
+				{/* 				<Textarea
 					rows={10}
 					value={value}
 					placeholder='yooo add something'
 					onChange={(e) => {
 						console.log(e.target.value)
 						setValue(e.target.value)
-					}}
-				/>
+					}} 
+				/>*/}
+				{fakeData.exercises.map((exercise) => {
+					return (
+						<div>
+							{exercise.name}
+							{exercise.sets.map((set) => {
+								return (
+									<div className='flex items-center mt-5'>
+										<div className='flex flex-col justify-center items-start w-1/3 pr-5'>
+											<Label htmlFor='reps'>Reps</Label>
+											<Input className='mt-2' value={set.reps} />
+										</div>
+										<div className='flex flex-col justify-center items-start w-1/3 pr-5'>
+											<Label htmlFor='weights'>Weight</Label>
+											<Input className='mt-2' value={set.weight} />
+										</div>
+									</div>
+								)
+							})}
+						</div>
+					)
+				})}
 			</Section>
 		</Page>
 	)
@@ -121,7 +175,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 	return {
 		props: {
 			user: data.user,
-			workout: workoutDetails.data
+			workout: workoutDetails.data,
 		},
 	}
 }

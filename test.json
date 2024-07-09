@@ -1,0 +1,19 @@
+{
+  "name": "Chest Day",
+  "date": "Tue Jul 09 2024",
+  "exercises": [
+    {
+      "name": "Bench",
+      "exercise": "exercise_id",
+      "sets": [{
+        "weight": 100,
+        "unit": "kg",
+        "reps": 5
+      }, {
+				"weight": 100,
+				"unit": "unit_id",
+				"reps": 3
+			}]
+    }
+  ]
+}

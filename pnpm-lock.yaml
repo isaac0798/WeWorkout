@@ -8,6 +8,7 @@ specifiers:
   '@radix-ui/react-slot': ^1.1.0
   '@supabase/ssr': ^0.4.0
   '@supabase/supabase-js': ^2.44.2
+  '@tanstack/react-table': ^8.19.2
   '@types/node': ^20.8.4
   '@types/react': ^18.2.28
   autoprefixer: ^10.4.16
@@ -44,6 +45,7 @@ dependencies:
   '@radix-ui/react-slot': 1.1.0_pcklb7m674k6u3r3q7fjhnofge
   '@supabase/ssr': 0.4.0_fuscct5f5repx2ogzp4enfgpze
   '@supabase/supabase-js': 2.44.2
+  '@tanstack/react-table': 8.19.2_biqbaboplfbrettd7655fr4n2y
   class-variance-authority: 0.7.0
   clsx: 2.1.1
   date-fns: 3.6.0
@@ -1823,6 +1825,23 @@ packages:
     resolution: {integrity: sha512-E4KcWTpoLHqwPHLxidpOqQbcrZVgi0rsmmZXUle1jXmJfuIf/UWpczUJ7MZZ5tlxytgJXyp0w4PGkkeLiuIdZw==}
     dependencies:
       tslib: 2.6.3
+    dev: false
+
+  /@tanstack/react-table/8.19.2_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-itoSIAkA/Vsg+bjY23FSemcTyPhc5/1YjYyaMsr9QSH/cdbZnQxHVWrpWn0Sp2BWN71qkzR7e5ye8WuMmwyOjg==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      '@tanstack/table-core': 8.19.2
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@tanstack/table-core/8.19.2:
+    resolution: {integrity: sha512-KpRjhgehIhbfH78ARm/GJDXGnpdw4bCg3qas6yjWSi7czJhI/J6pWln7NHtmBkGE9ZbohiiNtLqwGzKmBfixig==}
+    engines: {node: '>=12'}
     dev: false
 
   /@types/cookie/0.6.0:
