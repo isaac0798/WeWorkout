@@ -84,6 +84,7 @@ const Index = ({ user }: { user: User}) => {
 			</Section>
 			<Section>
 				<Textarea
+					rows={10}
 					value={value}
 					placeholder='yooo add something'
 					onChange={(e) => {
