@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/router'
 import { createFEClient } from '@/utils/supabase/component'
+import Link from 'next/link'
 
 const loginSchema = z.object({
 	email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -44,7 +45,7 @@ export default function LoginForm() {
 	}
 
 	return (
-		<div className='min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8'>
+		<div className='min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8 items-center'>
 			<div className='sm:mx-auto sm:w-full sm:max-w-md'>
 				<h2 className='mt-6 text-center text-3xl font-extrabold text-white'>
 					Log in to your account
@@ -107,6 +108,9 @@ export default function LoginForm() {
 					</Form>
 				</div>
 			</div>
+			<Button asChild className='bg-black mt-8 sm:mx-auto sm:w-full sm:max-w-md text-white'>
+				<Link href='/signup'>Dont have an account?</Link>
+			</Button>
 		</div>
 	)
 }
