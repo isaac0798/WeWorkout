@@ -60,7 +60,7 @@ interface WorkoutData {
 const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient()
 	const [date, setDate] = useState<Date | undefined>(new Date())
-	const [workout, setWorkout] = useState<WorkoutData>()
+	const [workout, setWorkout] = useState<WorkoutData | undefined>()
 	const [allExercises, setAllExercises] = useState<string[]>([])
 
 	const addSetToExercise = (exerciseName: string, newSet: ExerciseSet) => {
@@ -125,7 +125,7 @@ const Index = ({ user }: { user: User }) => {
 			<Section>
 				{workout?.exercises?.map((exercise) => {
 					return (
-						<div className='mt-5'>
+						<div className='mt-5' key={exercise.id}>
 							<Select>
 								<SelectTrigger className='w-[180px]'>
 									<SelectValue placeholder={exercise.name} />
@@ -133,8 +133,8 @@ const Index = ({ user }: { user: User }) => {
  								<SelectContent>
 									{allExercises
 										.filter((exercise) => exercise !== 'New Exercise')
-										.map((exercise) => (
-											<SelectItem value={exercise.name}>
+										.map((exercise, i) => (
+											<SelectItem value={exercise.name} key={i}>
 												{exercise.name}
 											</SelectItem>
 										))}
@@ -143,7 +143,7 @@ const Index = ({ user }: { user: User }) => {
 
 							{exercise.sets.map((set) => {
 								return (
-									<div className='flex items-center mt-5'>
+									<div className='flex items-center mt-5' key={set.id}>
 										<div className='flex flex-col justify-center items-start w-1/3 pr-5'>
 											<Label htmlFor='reps'>Reps</Label>
 											<Input className='mt-2' value={set.reps} />
