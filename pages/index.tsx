@@ -21,58 +21,41 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
+import getAllExercisesForUser from '@/lib/getAllExerciseForUsers'
 
-const fakeData: WorkoutData = {
-	name: 'Chest Day',
-	date: 'Tue Jul 09 2024',
+const defaultWorkoutData: WorkoutData = {
+	name: 'New Workout',
+	date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
 	exercises: [
 		{
-			name: 'Bench',
+			name: 'Squats',
 			sets: [
-				{
-					weight: 100,
-					reps: 5,
-				},
-				{
-					weight: 100,
-					reps: 3,
-				},
-			],
-		},
-		{
-			name: 'Shoulder Press',
-			sets: [
-				{
-					weight: 100,
-					reps: 5,
-				},
-				{
-					weight: 100,
-					reps: 3,
-				},
-			],
-		},
+				{ weight: 0, reps: 0 }],
+		}
 	],
 }
 
-type WorkoutData = {
-	name: string
-	date: string
-	exercises: {
-		name: string
-		sets: ExerciseSet[]
-	}[]
-}
-
-type ExerciseSet = {
+interface ExerciseSet {
 	weight: number
 	reps: number
+}
+
+interface Exercise {
+	name: string
+	sets: ExerciseSet[]
+}
+
+interface WorkoutData {
+	name: string
+	date: string
+	exercises: Exercise[]
 }
 
 const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient()
 	const [date, setDate] = useState<Date | undefined>(new Date())
-	const [workout, setWorkout] = useState<WorkoutData>(fakeData)
+	const [workout, setWorkout] = useState<WorkoutData>()
+	const [allExercises, setAllExercises] = useState<string[]>([])
 
 	const addSetToExercise = (exerciseName: string, newSet: ExerciseSet) => {
 		setWorkout((prevState) => {
@@ -95,51 +78,33 @@ const Index = ({ user }: { user: User }) => {
 	}
 
 	useEffect(() => {
-		async function getWorkoutForDate() {
-			const existingWorkout = await supabase
-				.from('Workouts')
-				.select()
-				.eq('user_id', user.id)
-				.eq('date', date?.toDateString())
+		getAllExercisesForUser(user.id, supabase).then((res) => setAllExercises(res))
+	}, [])
 
-			if (existingWorkout.data?.length) {
-				setWorkout(fakeData)
-			} else {
-				setWorkout(fakeData)
+	console.log('all exercises', allExercises)
+
+	useEffect(() => {
+		async function getWorkoutForDate() {
+			const { data, error } = await supabase.rpc(
+				'get_workout_for_user_on_date',
+				{
+					p_user_id: user.id,
+					p_date: date?.toDateString(),
+				},
+			)
+
+			if (error) {
+				console.error('Error fetching workout:', error)
+				return null
 			}
+
+			setWorkout(data.workout)
 		}
 
 		getWorkoutForDate()
-	}, [])
+	}, [date])
 
-	/* useEffect(() => {
-		async function saveWorkout() {
-			const existingWorkout = await supabase.from('Workouts').select().eq('user_id', user.id).eq('date', date?.toDateString());
-
-			console.log(existingWorkout)
-
-			if (!existingWorkout.data?.length) {
-				const { error } = await supabase
-					.from('Workouts')
-					.insert({
-						user_id: user.id,
-						name: 'this is a workout',
-						date: date?.toDateString(),
-						description: value,
-					})
-			}
-
-			const { error } = await supabase
-				.from('Workouts')
-				.update({
-					description: value,
-				})
-				.eq('user_id', user.id)
-				.eq('date', date?.toDateString())
-		}
-
-		saveWorkout();
-	}, [value]) */
+	console.log(workout)
 
 	return (
 		<Page>
@@ -152,7 +117,7 @@ const Index = ({ user }: { user: User }) => {
 				/>
 			</Section>
 			<Section>
-				{workout.exercises.map((exercise) => {
+				{workout?.exercises?.map((exercise) => {
 					return (
 						<div className='mt-5'>
 							<Select>
@@ -160,11 +125,11 @@ const Index = ({ user }: { user: User }) => {
 									<SelectValue placeholder={exercise.name} />
 								</SelectTrigger>
 								<SelectContent>
-									{workout.exercises
-										.filter((exercise) => exercise.name !== 'New Exercise')
+									{allExercises
+										.filter((exercise) => exercise !== 'New Exercise')
 										.map((exercise) => (
-											<SelectItem value={exercise.name}>
-												{exercise.name}
+											<SelectItem value={exercise}>
+												{exercise}
 											</SelectItem>
 										))}
 								</SelectContent>
@@ -188,8 +153,8 @@ const Index = ({ user }: { user: User }) => {
 							<Button
 								className='mt-5'
 								onClick={() => {
-									const newSet = {weight: 0, reps: 0}
-									
+									const newSet = { weight: 0, reps: 0 }
+
 									addSetToExercise(exercise.name, newSet)
 								}}
 							>
@@ -201,35 +166,54 @@ const Index = ({ user }: { user: User }) => {
 			</Section>
 			<Section>
 				<Button
-					onClick={() => {
-						setWorkout({
-							...workout,
+/* 					onClick={() => {
+						const updateWorkoutData = (newData: Partial<WorkoutData>) => {
+							setWorkout((currentData) => {
+								if (!currentData) return defaultWorkoutData // or provide a default WorkoutData object
+								return {
+									...currentData,
+									...newData,
+									name: newData.name || currentData.name,
+									date: newData.date || currentData.date,
+								}
+							})
+						}
+
+						// Usage
+						updateWorkoutData({
 							exercises: [
-								...workout.exercises,
 								{
-									name: 'New Exercise',
-									sets: [{ weight: 0, reps: 0 }],
+									name: 'squats',
+									sets: [
+										{ weight: 100, reps: 5 },
+										{ weight: 100, reps: 5 },
+									],
 								},
 							],
 						})
-					}}
+					}} */
 				>
 					Add Exercise
 				</Button>
-				<Button className='ml-5' onClick={async () => {
-					const { data, error } = await supabase.functions.invoke(
-						'insert_workout',
-						{
-							body: JSON.stringify({
-								workoutData: workout,
-								userId: user.id,
-							}),
-						},
-					)
+				<Button
+					className='ml-5'
+					onClick={async () => {
+						const { data, error } = await supabase.functions.invoke(
+							'insert_workout',
+							{
+								body: JSON.stringify({
+									workoutData: workout,
+									userId: user.id,
+								}),
+							},
+						)
 
-					if (error) console.error('Error:', error)
-					else console.log('Success:', data)
-				}}>Save</Button>
+						if (error) console.error('Error:', error)
+						else console.log('Success:', data)
+					}}
+				>
+					Save
+				</Button>
 			</Section>
 		</Page>
 	)
