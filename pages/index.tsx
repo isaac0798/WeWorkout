@@ -60,13 +60,15 @@ interface WorkoutData {
 const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient()
 	const [date, setDate] = useState<Date | undefined>(new Date())
-	const [workout, setWorkout] = useState<WorkoutData | undefined>()
-	const [allExercises, setAllExercises] = useState<string[]>([])
+	const [workout, setWorkout] = useState<WorkoutData>(defaultWorkoutData)
+	const [allExercises, setAllExercises] = useState<
+		{ id: string; name: string }[]
+	>([])
 
 	const addSetToExercise = (exerciseName: string, newSet: ExerciseSet) => {
 		setWorkout((prevState) => {
 			// Map over the exercises to find the one we want to update
-			const updatedExercises = prevState.exercises.map((exercise) => {
+			const updatedExercises = prevState?.exercises.map((exercise) => {
 				if (exercise.name === exerciseName) {
 					// Create a new sets array with the new set added
 					console.log(exercise.sets)
@@ -101,7 +103,7 @@ const Index = ({ user }: { user: User }) => {
 
 			if (error) {
 				console.error('Error fetching workout:', error)
-				return null
+				return defaultWorkoutData
 			}
 
 			setWorkout(data.workout)
@@ -132,7 +134,7 @@ const Index = ({ user }: { user: User }) => {
 								</SelectTrigger>
  								<SelectContent>
 									{allExercises
-										.filter((exercise) => exercise !== 'New Exercise')
+										.filter((exercise) => exercise.name !== 'New Exercise')
 										.map((exercise, i) => (
 											<SelectItem value={exercise.name} key={i}>
 												{exercise.name}

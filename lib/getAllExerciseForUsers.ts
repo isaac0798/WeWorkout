@@ -1,4 +1,4 @@
-async function getAllExercisesForUser(userId, supabase): Promise<string[]> {
+async function getAllExercisesForUser(userId: string, supabase: any): Promise<{id: string, name: string}[]> {
   const { data, error } = await supabase
     .from('Workout')
     .select(`
@@ -15,7 +15,7 @@ async function getAllExercisesForUser(userId, supabase): Promise<string[]> {
 
   if (error) {
     console.error('Error fetching exercises:', error)
-    return null
+    return []
   }
 
   // Extract unique exercises
