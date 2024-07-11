@@ -14,6 +14,14 @@ import { useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
+
 const fakeData: WorkoutData = {
 	name: 'Chest Day',
 	date: 'Tue Jul 09 2024',
@@ -24,12 +32,24 @@ const fakeData: WorkoutData = {
 			sets: [
 				{
 					weight: 100,
-					unit: 'kg',
 					reps: 5,
 				},
 				{
 					weight: 100,
-					unit: 'unit_id',
+					reps: 3,
+				},
+			],
+		},
+		{
+			name: 'Shoulder Press',
+			exercise: 'exercise_id',
+			sets: [
+				{
+					weight: 100,
+					reps: 5,
+				},
+				{
+					weight: 100,
 					reps: 3,
 				},
 			],
@@ -49,14 +69,33 @@ type WorkoutData = {
 
 type ExerciseSet = {
 	weight: number
-	unit: string
 	reps: number
 }
 
 const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient()
 	const [date, setDate] = useState<Date | undefined>(new Date())
-	const [workout, setWorkout] = useState<any>()
+	const [workout, setWorkout] = useState<any>(fakeData)
+
+	const addSetToExercise = (exerciseName, newSet) => {
+		setWorkout((prevState) => {
+			// Map over the exercises to find the one we want to update
+			const updatedExercises = prevState.exercises.map((exercise) => {
+				if (exercise.name === exerciseName) {
+					// Create a new sets array with the new set added
+					console.log(exercise.sets)
+					const updatedSets = [...exercise.sets, newSet]
+					console.log(updatedSets)
+					// Return the updated exercise object
+					return { ...exercise, sets: updatedSets }
+				}
+				// Return the original exercise object if it doesn't match
+				return exercise
+			})
+			// Return the new state object with the updated exercises array
+			return { ...prevState, exercises: updatedExercises }
+		})
+	}
 
 	useEffect(() => {
 		async function getWorkoutForDate() {
@@ -125,10 +164,24 @@ const Index = ({ user }: { user: User }) => {
 						setValue(e.target.value)
 					}} 
 				/>*/}
-				{fakeData.exercises.map((exercise) => {
+				{workout.exercises.map((exercise) => {
 					return (
-						<div>
-							{exercise.name}
+						<div className='mt-5'>
+							<Select>
+								<SelectTrigger className='w-[180px]'>
+									<SelectValue placeholder={exercise.name} />
+								</SelectTrigger>
+								<SelectContent>
+									{workout.exercises
+										.filter((exercise) => exercise.name !== 'New Exercise')
+										.map((exercise) => (
+											<SelectItem value={exercise.name}>
+												{exercise.name}
+											</SelectItem>
+										))}
+								</SelectContent>
+							</Select>
+
 							{exercise.sets.map((set) => {
 								return (
 									<div className='flex items-center mt-5'>
@@ -143,9 +196,39 @@ const Index = ({ user }: { user: User }) => {
 									</div>
 								)
 							})}
+
+							<Button
+								className='mt-5'
+								onClick={() => {
+									const newSet = {weight: 0, reps: 0}
+									
+									addSetToExercise(exercise.name, newSet)
+								}}
+							>
+								Add Set
+							</Button>
 						</div>
 					)
 				})}
+			</Section>
+			<Section>
+				<Button
+					onClick={() => {
+						setWorkout({
+							...workout,
+							exercises: [
+								...workout.exercises,
+								{
+									name: 'New Exercise',
+									sets: [{ weight: 0, reps: 0 }],
+								},
+							],
+						})
+					}}
+				>
+					Add Exercise
+				</Button>
+				<Button className='ml-5'>Save</Button>
 			</Section>
 		</Page>
 	)
