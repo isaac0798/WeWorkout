@@ -28,7 +28,6 @@ const fakeData: WorkoutData = {
 	exercises: [
 		{
 			name: 'Bench',
-			exercise: 'exercise_id',
 			sets: [
 				{
 					weight: 100,
@@ -42,7 +41,6 @@ const fakeData: WorkoutData = {
 		},
 		{
 			name: 'Shoulder Press',
-			exercise: 'exercise_id',
 			sets: [
 				{
 					weight: 100,
@@ -62,7 +60,6 @@ type WorkoutData = {
 	date: string
 	exercises: {
 		name: string
-		exercise: string
 		sets: ExerciseSet[]
 	}[]
 }
@@ -75,9 +72,9 @@ type ExerciseSet = {
 const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient()
 	const [date, setDate] = useState<Date | undefined>(new Date())
-	const [workout, setWorkout] = useState<any>(fakeData)
+	const [workout, setWorkout] = useState<WorkoutData>(fakeData)
 
-	const addSetToExercise = (exerciseName, newSet) => {
+	const addSetToExercise = (exerciseName: string, newSet: ExerciseSet) => {
 		setWorkout((prevState) => {
 			// Map over the exercises to find the one we want to update
 			const updatedExercises = prevState.exercises.map((exercise) => {
@@ -155,15 +152,6 @@ const Index = ({ user }: { user: User }) => {
 				/>
 			</Section>
 			<Section>
-				{/* 				<Textarea
-					rows={10}
-					value={value}
-					placeholder='yooo add something'
-					onChange={(e) => {
-						console.log(e.target.value)
-						setValue(e.target.value)
-					}} 
-				/>*/}
 				{workout.exercises.map((exercise) => {
 					return (
 						<div className='mt-5'>
@@ -228,7 +216,20 @@ const Index = ({ user }: { user: User }) => {
 				>
 					Add Exercise
 				</Button>
-				<Button className='ml-5'>Save</Button>
+				<Button className='ml-5' onClick={async () => {
+					const { data, error } = await supabase.functions.invoke(
+						'insert_workout',
+						{
+							body: JSON.stringify({
+								workoutData: workout,
+								userId: user.id,
+							}),
+						},
+					)
+
+					if (error) console.error('Error:', error)
+					else console.log('Success:', data)
+				}}>Save</Button>
 			</Section>
 		</Page>
 	)
