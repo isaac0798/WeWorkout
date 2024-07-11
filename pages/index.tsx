@@ -104,7 +104,7 @@ const Index = ({ user }: { user: User }) => {
 		getWorkoutForDate()
 	}, [date])
 
-	console.log(workout)
+	console.log('workout', workout)
 
 	return (
 		<Page>
@@ -124,12 +124,12 @@ const Index = ({ user }: { user: User }) => {
 								<SelectTrigger className='w-[180px]'>
 									<SelectValue placeholder={exercise.name} />
 								</SelectTrigger>
-								<SelectContent>
+ 								<SelectContent>
 									{allExercises
 										.filter((exercise) => exercise !== 'New Exercise')
 										.map((exercise) => (
-											<SelectItem value={exercise}>
-												{exercise}
+											<SelectItem value={exercise.name}>
+												{exercise.name}
 											</SelectItem>
 										))}
 								</SelectContent>
@@ -165,34 +165,7 @@ const Index = ({ user }: { user: User }) => {
 				})}
 			</Section>
 			<Section>
-				<Button
-/* 					onClick={() => {
-						const updateWorkoutData = (newData: Partial<WorkoutData>) => {
-							setWorkout((currentData) => {
-								if (!currentData) return defaultWorkoutData // or provide a default WorkoutData object
-								return {
-									...currentData,
-									...newData,
-									name: newData.name || currentData.name,
-									date: newData.date || currentData.date,
-								}
-							})
-						}
-
-						// Usage
-						updateWorkoutData({
-							exercises: [
-								{
-									name: 'squats',
-									sets: [
-										{ weight: 100, reps: 5 },
-										{ weight: 100, reps: 5 },
-									],
-								},
-							],
-						})
-					}} */
-				>
+				<Button>
 					Add Exercise
 				</Button>
 				<Button
