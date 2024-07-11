@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 
 import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -24,28 +25,33 @@ import {
 import getAllExercisesForUser from '@/lib/getAllExerciseForUsers'
 
 const defaultWorkoutData: WorkoutData = {
+	id: uuidv4(),
 	name: 'New Workout',
 	date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
 	exercises: [
 		{
-			name: 'Squats',
+			id: uuidv4(),
+			name: 'N/A',
 			sets: [
-				{ weight: 0, reps: 0 }],
+				{ id: uuidv4(), weight: 0, reps: 0 }],
 		}
 	],
 }
 
 interface ExerciseSet {
+	id: string
 	weight: number
 	reps: number
 }
 
 interface Exercise {
+	id: string
 	name: string
 	sets: ExerciseSet[]
 }
 
 interface WorkoutData {
+	id: string
 	name: string
 	date: string
 	exercises: Exercise[]
@@ -153,7 +159,7 @@ const Index = ({ user }: { user: User }) => {
 							<Button
 								className='mt-5'
 								onClick={() => {
-									const newSet = { weight: 0, reps: 0 }
+									const newSet = { id: uuidv4(), weight: 0, reps: 0 }
 
 									addSetToExercise(exercise.name, newSet)
 								}}
@@ -165,7 +171,32 @@ const Index = ({ user }: { user: User }) => {
 				})}
 			</Section>
 			<Section>
-				<Button>
+				<Button onClick={() => {
+					const updateWorkoutData = (newData: Partial<WorkoutData>) => {
+						setWorkout((currentData) => {
+							if (!currentData) return defaultWorkoutData // or provide a default WorkoutData object
+							return {
+								...currentData,
+								...newData,
+								name: newData.name || currentData.name,
+								date: newData.date || currentData.date,
+							}
+						})
+					}
+
+					// Usage
+					updateWorkoutData({
+						exercises: [
+							{
+								id: uuidv4(),
+								name: 'N/A',
+								sets: [
+									{ id: uuidv4(), weight: 0, reps: 0 },
+								],
+							},
+						],
+					})
+				}}>
 					Add Exercise
 				</Button>
 				<Button
