@@ -24,6 +24,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import getAllExercisesForUser from "@/lib/getAllExerciseForUsers";
+import removeExercise from "@/lib/removeExercise";
 
 const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),
@@ -50,7 +51,7 @@ interface Exercise {
 	sets: ExerciseSet[];
 }
 
-interface WorkoutData {
+export interface WorkoutData {
 	id: string;
 	name: string;
 	date: string;
@@ -116,6 +117,10 @@ const Index = ({ user }: { user: User }) => {
 
 	console.log("workout", workout);
 
+	const handleRemoveExercise = (exerciseId: string) => {
+		setWorkout((currentWorkout) => removeExercise(currentWorkout, exerciseId));
+	};
+
 	return (
 		<Page>
 			<Section>
@@ -148,7 +153,7 @@ const Index = ({ user }: { user: User }) => {
 										<Button
 											variant="ghost"
 											size="icon"
-											onClick={() => console.log("delete")}
+											onClick={() => handleRemoveExercise(exercise.id)}
 										>
 											<i className="bi bi-trash3"></i>
 										</Button>
