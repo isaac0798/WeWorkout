@@ -1,20 +1,21 @@
-import { useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import type { GetServerSidePropsContext } from "next";
+import { useState } from "react";
 
-import { createClient } from "@/utils/supabase/server-props";
-import { createFEClient } from "@/utils/supabase/component";
-import { Calendar } from "@/components/ui/calendar";
 import Page from "@/components/page";
 import Section from "@/components/section";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Textarea } from "@/components/ui/textarea";
+import { createFEClient } from "@/utils/supabase/component";
+import { createClient } from "@/utils/supabase/server-props";
 
-import { useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
+import { EditableHeader } from "@/components/EditableHeader";
 import {
 	Select,
 	SelectContent,
@@ -23,7 +24,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import getAllExercisesForUser from "@/lib/getAllExerciseForUsers";
-import { EditableHeader } from "@/components/EditableHeader";
 
 const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),

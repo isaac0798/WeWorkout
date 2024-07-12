@@ -1,9 +1,9 @@
 interface Props {
-	children: React.ReactNode
+	children: React.ReactNode;
 }
 
 const Section = ({ children }: Props) => (
-	<section className='mt-10'>{children}</section>
-)
+	<section className="mt-10">{children}</section>
+);
 
-export default Section
+export default Section;
