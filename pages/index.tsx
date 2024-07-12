@@ -66,6 +66,30 @@ const Index = ({ user }: { user: User }) => {
 		{ id: string; name: string }[]
 	>([]);
 
+	function updateSet(
+		workoutData: WorkoutData,
+		exerciseId: string,
+		setIndex: number,
+		field: 'weight' | 'reps',
+		value: string
+	): WorkoutData {
+		return {
+			...workoutData,
+			exercises: workoutData.exercises.map(exercise => 
+				exercise.id === exerciseId
+					? {
+							...exercise,
+							sets: exercise.sets.map((set, index) => 
+								index === setIndex
+									? { ...set, [field]: value }
+									: set
+							)
+						}
+					: exercise
+			)
+		};
+	}
+
 	const addSetToExercise = (exerciseName: string, newSet: ExerciseSet) => {
 		setWorkout((prevState) => {
 			// Map over the exercises to find the one we want to update
@@ -169,16 +193,22 @@ const Index = ({ user }: { user: User }) => {
 									</SelectContent>
 								</Select>
 
-								{exercise.sets.map((set) => {
+								{exercise.sets.map((set, i) => {
 									return (
 										<div className="flex items-center mt-5" key={set.id}>
 											<div className="flex flex-col justify-center items-start w-1/3 pr-5">
 												<Label htmlFor="reps">Reps</Label>
-												<Input className="mt-2" value={set.reps} />
+												<Input className="mt-2" value={set.reps} onChange={(e) => {
+													const newWorkout = updateSet(workout, exercise.id, i, 'reps', e.target.value)
+													setWorkout(newWorkout)
+												}} />
 											</div>
 											<div className="flex flex-col justify-center items-start w-1/3 pr-5">
 												<Label htmlFor="weights">Weight</Label>
-												<Input className="mt-2" value={set.weight} />
+												<Input className="mt-2" value={set.weight} onChange={(e) => {
+													const newWorkout = updateSet(workout, exercise.id, i, 'weight', e.target.value)
+													setWorkout(newWorkout)
+												}} />
 											</div>
 										</div>
 									);
