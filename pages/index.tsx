@@ -106,6 +106,22 @@ const Index = ({ user }: { user: User }) => {
 		});
 	};
 
+	const removeSetFromExercise = (exerciseId: string, setIndex: number) => {
+		setWorkout((prevState) => {
+			if (!prevState) return prevState; // Handle case where prevState is null or undefined
+
+			const updatedExercises = prevState.exercises.map((exercise) => {
+				if (exercise.id === exerciseId) {
+					const updatedSets = exercise.sets.filter((_, index) => index !== setIndex);
+					return { ...exercise, sets: updatedSets };
+				}
+				return exercise;
+			});
+
+			return { ...prevState, exercises: updatedExercises };
+		});
+	};
+
 	useEffect(() => {
 		getAllExercisesForUser(user.id, supabase).then((res) =>
 			setAllExercises(res),
@@ -226,9 +242,14 @@ const Index = ({ user }: { user: User }) => {
 													}}
 												/>
 											</div>
-										</div>
-									)
-								})}
+											<Button variant="ghost" size="icon" className="mt-5" onClick={() => 
+												removeSetFromExercise(exercise.id, i)
+											}>
+												<i className="bi bi-trash3"></i>
+											</Button>
+											</div>
+										)
+									})}
 
 								<Button
 									className='mt-5'
