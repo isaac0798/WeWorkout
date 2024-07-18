@@ -33,7 +33,6 @@ export default function LoginForm() {
 	});
 
 	async function onSubmit(values: z.infer<typeof loginSchema>) {
-		console.log(values);
 		const { error } = await supabase.auth.signInWithPassword({
 			email: values.email,
 			password: values.password,
