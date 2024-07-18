@@ -52,7 +52,6 @@ export interface WorkoutData {
 }
 
 const Index = ({ user }: { user: User }) => {
-	console.log('render home page')
 	const supabase = createFEClient()
 	const [date, setDate] = useState<Date | undefined>(new Date())
 	const [workout, setWorkout] = useState<WorkoutData>(defaultWorkoutData)
@@ -173,7 +172,7 @@ const Index = ({ user }: { user: User }) => {
 			<Suspense fallback={<h1>Loading....</h1>}>
 				<Section>
 					<EditableHeader
-						initialText={workout.name || 'NoName'}
+						initialText={workout?.name || 'New Workout'}
 						onSave={(newWorkoutName) => {
 							setWorkout({
 								...workout,
@@ -189,11 +188,18 @@ const Index = ({ user }: { user: User }) => {
 										options={allExercises}
 										placeholder={exercise.name}
 										onAddOption={(newExercise) => {
-											console.log('hiya', newExercise)
 											setAllExercises([...allExercises, newExercise])
 										}}
 										onSelect={(value) => {
-											console.log(value)
+											const newExercises = workout.exercises.map((exercise) => {
+												if (exercise.name === 'N/A') {
+													exercise.name = value
+												}
+
+												return exercise
+											})
+
+											setWorkout({...workout, exercises: newExercises})
 										}}
 									/>
 
@@ -270,6 +276,16 @@ const Index = ({ user }: { user: User }) => {
 								return
 							}
 
+							const unFilledExercise = workout.exercises?.some(
+								(exercise) => exercise.name === 'N/A',
+							)
+
+							if (unFilledExercise) {
+								alert('Fill in all exercises pls before adding more')
+
+								return
+							}
+
 							setWorkout({
 								...workout,
 								exercises: [
@@ -288,8 +304,17 @@ const Index = ({ user }: { user: User }) => {
 					<Button
 						className='ml-5'
 						onClick={async () => {
+							const unFilledExercise = workout.exercises?.some((exercise) => exercise.name === 'N/A')
+
+							if (unFilledExercise) {
+								alert('Fill in all exercises pls')
+
+								return
+							}
+
+
 							const { data, error } = await supabase.functions.invoke(
-								'upsert_workout',
+								'insert_workout',
 								{
 									body: JSON.stringify({
 										workoutData: workout,

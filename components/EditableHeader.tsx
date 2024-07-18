@@ -8,7 +8,6 @@ interface EditableHeaderProps {
 }
 
 export function EditableHeader({ initialText, onSave }: EditableHeaderProps) {
-	console.log('render')
 	const [isEditing, setIsEditing] = useState(false);
 
 	const handleSave = (value) => {
