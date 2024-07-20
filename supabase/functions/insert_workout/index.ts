@@ -19,10 +19,16 @@ interface WorkoutData {
 
 Deno.serve(async (req) => {
 	// Create a Supabase client with the Admin key
-	const supabaseClient = createClient(
+	/* const supabaseClient = createClient(
 		Deno.env.get('http://127.0.0.1:54321') ?? '',
 		Deno.env.get('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU') ?? '',
-	)
+	) */
+
+	const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+    )
 
 	if (req.method === 'OPTIONS') {
 		return new Response('ok', {
@@ -38,7 +44,7 @@ Deno.serve(async (req) => {
 	const { workoutData, userId } = await req.json()
 
 	// Start a database transaction
-	const { data, error } = await supabaseClient.rpc('insert_workout_data', {
+	const { data, error } = await supabase.rpc('upsert_workout', {
 		p_workout_data: workoutData,
 		p_user_id: userId,
 	})
