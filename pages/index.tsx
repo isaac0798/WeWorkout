@@ -107,25 +107,17 @@ const Index = ({ user }: { user: User }) => {
 	};
 
 	useEffect(() => {
-		getAllExercisesForUser(user.id, supabase).then((res) => {
-			if (res.length) {
-				setAllExercises(res);
-
-				return;
-			}
-
-			supabase
-				.from("Exercise")
-				.select("id, name")
-				.order("name")
-				.then(({ data, error }) => {
-					if (error) {
-						console.error("Error fetching exercises:", error);
-						throw error;
-					}
-					setAllExercises(data);
-				});
-		});
+		supabase
+			.from("Exercise")
+			.select("id, name")
+			.order("name")
+			.then(({ data, error }) => {
+				if (error) {
+					console.error("Error fetching exercises:", error);
+					throw error;
+				}
+				setAllExercises(data);
+			});
 	}, []);
 
 	useEffect(() => {
