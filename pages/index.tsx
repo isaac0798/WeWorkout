@@ -1,63 +1,63 @@
-import type { User } from '@supabase/supabase-js'
-import type { GetServerSidePropsContext } from 'next'
-import { useState } from 'react'
-import { Suspense } from 'react'
-import Page from '@/components/page'
-import Section from '@/components/section'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { createFEClient } from '@/utils/supabase/component'
-import { createClient } from '@/utils/supabase/server-props'
+import Page from "@/components/page";
+import Section from "@/components/section";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { createFEClient } from "@/utils/supabase/component";
+import { createClient } from "@/utils/supabase/server-props";
+import type { User } from "@supabase/supabase-js";
+import type { GetServerSidePropsContext } from "next";
+import { useState } from "react";
+import { Suspense } from "react";
 
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
-import { EditableHeader } from '@/components/EditableHeader'
-import getAllExercisesForUser from '@/lib/getAllExerciseForUsers'
-import removeExercise from '@/lib/removeExercise'
-import { DynamicSelect } from '@/components/DynamicSelect'
+import { DynamicSelect } from "@/components/DynamicSelect";
+import { EditableHeader } from "@/components/EditableHeader";
+import getAllExercisesForUser from "@/lib/getAllExerciseForUsers";
+import removeExercise from "@/lib/removeExercise";
 
 const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),
-	name: 'New Workout',
-	date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+	name: "New Workout",
+	date: new Date().toISOString().split("T")[0], // Today's date in YYYY-MM-DD format
 	exercises: [],
-}
+};
 
 interface ExerciseSet {
-	id: string
-	weight: number
-	reps: number
+	id: string;
+	weight: number;
+	reps: number;
 }
 
 interface Exercise {
-	id: string
-	name: string
-	sets: ExerciseSet[]
+	id: string;
+	name: string;
+	sets: ExerciseSet[];
 }
 
 export interface WorkoutData {
-	id: string
-	name: string
-	date: string
-	exercises: Exercise[]
+	id: string;
+	name: string;
+	date: string;
+	exercises: Exercise[];
 }
 
 const Index = ({ user }: { user: User }) => {
-	const supabase = createFEClient()
-	const [date, setDate] = useState<Date | undefined>(new Date())
-	const [workout, setWorkout] = useState<WorkoutData>(defaultWorkoutData)
+	const supabase = createFEClient();
+	const [date, setDate] = useState<Date | undefined>(new Date());
+	const [workout, setWorkout] = useState<WorkoutData>(defaultWorkoutData);
 	const [allExercises, setAllExercises] = useState<
 		{ id: string; name: string }[]
-	>([])
+	>([]);
 
 	function updateSet(
 		workoutData: WorkoutData,
 		exerciseId: string,
 		setIndex: number,
-		field: 'weight' | 'reps',
+		field: "weight" | "reps",
 		value: string,
 	): WorkoutData {
 		return {
@@ -72,75 +72,75 @@ const Index = ({ user }: { user: User }) => {
 						}
 					: exercise,
 			),
-		}
+		};
 	}
 
 	const addSetToExercise = (exerciseId: string, newSet: ExerciseSet) => {
 		setWorkout((prevState) => {
 			const updatedExercises = prevState?.exercises.map((exercise) => {
 				if (exercise.id === exerciseId) {
-					const updatedSets = [...exercise.sets, newSet]
-					return { ...exercise, sets: updatedSets }
+					const updatedSets = [...exercise.sets, newSet];
+					return { ...exercise, sets: updatedSets };
 				}
-				return exercise
-			})
-			return { ...prevState, exercises: updatedExercises }
-		})
-	}
+				return exercise;
+			});
+			return { ...prevState, exercises: updatedExercises };
+		});
+	};
 
 	const removeSetFromExercise = (exerciseId: string, setIndex: number) => {
 		setWorkout((prevState) => {
-			if (!prevState) return prevState // Handle case where prevState is null or undefined
+			if (!prevState) return prevState; // Handle case where prevState is null or undefined
 
 			const updatedExercises = prevState.exercises.map((exercise) => {
 				if (exercise.id === exerciseId) {
 					const updatedSets = exercise.sets.filter(
 						(_, index) => index !== setIndex,
-					)
-					return { ...exercise, sets: updatedSets }
+					);
+					return { ...exercise, sets: updatedSets };
 				}
-				return exercise
-			})
+				return exercise;
+			});
 
-			return { ...prevState, exercises: updatedExercises }
-		})
-	}
+			return { ...prevState, exercises: updatedExercises };
+		});
+	};
 
 	useEffect(() => {
 		getAllExercisesForUser(user.id, supabase).then((res) => {
 			if (res.length) {
-				setAllExercises(res)
+				setAllExercises(res);
 
-				return
+				return;
 			}
 
 			supabase
-				.from('Exercise')
-				.select('id, name')
-				.order('name')
+				.from("Exercise")
+				.select("id, name")
+				.order("name")
 				.then(({ data, error }) => {
 					if (error) {
-						console.error('Error fetching exercises:', error)
-						throw error
+						console.error("Error fetching exercises:", error);
+						throw error;
 					}
-					setAllExercises(data)
-				})
-		})
-	}, [])
+					setAllExercises(data);
+				});
+		});
+	}, []);
 
 	useEffect(() => {
 		async function getWorkoutForDate() {
 			const { data, error } = await supabase.rpc(
-				'get_workout_for_user_on_date',
+				"get_workout_for_user_on_date",
 				{
 					p_user_id: user.id,
 					p_date: date?.toDateString(),
 				},
-			)
+			);
 
 			if (error) {
-				console.error('Error fetching workout:', error)
-				return defaultWorkoutData
+				console.error("Error fetching workout:", error);
+				return defaultWorkoutData;
 			}
 
 			if (!data.workout) {
@@ -149,141 +149,141 @@ const Index = ({ user }: { user: User }) => {
 				return;
 			}
 
-			setWorkout(data.workout)
+			setWorkout(data.workout);
 		}
 
-		getWorkoutForDate()
-	}, [date])
+		getWorkoutForDate();
+	}, [date]);
 
 	const handleRemoveExercise = (exerciseId: string) => {
-		setWorkout((currentWorkout) => removeExercise(currentWorkout, exerciseId))
-	}
+		setWorkout((currentWorkout) => removeExercise(currentWorkout, exerciseId));
+	};
 
 	return (
 		<Page>
 			<Section>
 				<Calendar
-					mode='single'
+					mode="single"
 					selected={date}
 					onSelect={setDate}
-					className='rounded-md border'
+					className="rounded-md border"
 				/>
 			</Section>
 			<Suspense fallback={<h1>Loading....</h1>}>
 				<Section>
 					<EditableHeader
-						initialText={workout?.name || 'New Workout'}
+						initialText={workout?.name || "New Workout"}
 						onSave={(newWorkoutName) => {
 							setWorkout({
 								...workout,
 								name: newWorkoutName,
-							})
+							});
 						}}
 					/>
 					{workout?.exercises?.map((exercise) => {
 						return (
 							<>
-								<div className='mt-5' key={exercise.id}>
+								<div className="mt-5" key={exercise.id}>
 									<DynamicSelect
 										options={allExercises}
 										placeholder={exercise.name}
 										onAddOption={(newExercise) => {
-											setAllExercises([...allExercises, newExercise])
+											setAllExercises([...allExercises, newExercise]);
 										}}
 										onSelect={(value) => {
 											const newExercises = workout.exercises.map((exercise) => {
-												if (exercise.name === 'N/A') {
-													exercise.name = value
+												if (exercise.name === "N/A") {
+													exercise.name = value;
 												}
 
-												return exercise
-											})
+												return exercise;
+											});
 
-											setWorkout({...workout, exercises: newExercises})
+											setWorkout({ ...workout, exercises: newExercises });
 										}}
 									/>
 
 									{exercise.sets.map((set, i) => {
 										return (
-											<div className='flex items-center mt-5' key={set.id}>
-												<div className='flex flex-col justify-center items-start w-1/3 pr-5'>
-													<Label htmlFor='reps'>Reps</Label>
+											<div className="flex items-center mt-5" key={set.id}>
+												<div className="flex flex-col justify-center items-start w-1/3 pr-5">
+													<Label htmlFor="reps">Reps</Label>
 													<Input
-														className='mt-2'
+														className="mt-2"
 														value={set.reps}
 														onChange={(e) => {
 															const newWorkout = updateSet(
 																workout,
 																exercise.id,
 																i,
-																'reps',
+																"reps",
 																e.target.value,
-															)
-															setWorkout(newWorkout)
+															);
+															setWorkout(newWorkout);
 														}}
 													/>
 												</div>
-												<div className='flex flex-col justify-center items-start w-1/3 pr-5'>
-													<Label htmlFor='weights'>Weight</Label>
+												<div className="flex flex-col justify-center items-start w-1/3 pr-5">
+													<Label htmlFor="weights">Weight</Label>
 													<Input
-														className='mt-2'
+														className="mt-2"
 														value={set.weight}
 														onChange={(e) => {
 															const newWorkout = updateSet(
 																workout,
 																exercise.id,
 																i,
-																'weight',
+																"weight",
 																e.target.value,
-															)
-															setWorkout(newWorkout)
+															);
+															setWorkout(newWorkout);
 														}}
 													/>
 												</div>
 												<Button
-													variant='ghost'
-													size='icon'
-													className='mt-5'
+													variant="ghost"
+													size="icon"
+													className="mt-5"
 													onClick={() => removeSetFromExercise(exercise.id, i)}
 												>
-													<i className='bi bi-trash3'></i>
+													<i className="bi bi-trash3"></i>
 												</Button>
 											</div>
-										)
+										);
 									})}
 
 									<Button
-										className='mt-5'
+										className="mt-5"
 										onClick={() => {
-											const newSet = { id: uuidv4(), weight: 0, reps: 0 }
+											const newSet = { id: uuidv4(), weight: 0, reps: 0 };
 
-											addSetToExercise(exercise.id, newSet)
+											addSetToExercise(exercise.id, newSet);
 										}}
 									>
 										Add Set
 									</Button>
 								</div>
 							</>
-						)
+						);
 					})}
 				</Section>
 				<Section>
 					<Button
 						onClick={() => {
 							if (!workout) {
-								setWorkout(defaultWorkoutData)
+								setWorkout(defaultWorkoutData);
 
-								return
+								return;
 							}
 
 							const unFilledExercise = workout.exercises?.some(
-								(exercise) => exercise.name === 'N/A',
-							)
+								(exercise) => exercise.name === "N/A",
+							);
 
 							if (unFilledExercise) {
-								alert('Fill in all exercises pls before adding more')
+								alert("Fill in all exercises pls before adding more");
 
-								return
+								return;
 							}
 
 							setWorkout({
@@ -292,41 +292,42 @@ const Index = ({ user }: { user: User }) => {
 									...workout.exercises,
 									{
 										id: uuidv4(),
-										name: 'N/A',
+										name: "N/A",
 										sets: [{ id: uuidv4(), weight: 0, reps: 0 }],
 									},
 								],
-							})
+							});
 						}}
 					>
 						Add Exercise
 					</Button>
 					<Button
-						className='ml-5'
+						className="ml-5"
 						onClick={async () => {
-							const unFilledExercise = workout.exercises?.some((exercise) => exercise.name === 'N/A')
+							const unFilledExercise = workout.exercises?.some(
+								(exercise) => exercise.name === "N/A",
+							);
 
 							if (unFilledExercise) {
-								alert('Fill in all exercises pls')
+								alert("Fill in all exercises pls");
 
-								return
+								return;
 							}
 
 							//TODO fix insert bug
 
-
 							const { data, error } = await supabase.functions.invoke(
-								'insert_workout',
+								"insert_workout",
 								{
 									body: JSON.stringify({
 										workoutData: workout,
 										userId: user.id,
 									}),
 								},
-							)
+							);
 
-							if (error) console.error('Error:', error)
-							else console.log('Success:', data)
+							if (error) console.error("Error:", error);
+							else console.log("Success:", data);
 						}}
 					>
 						Save
@@ -334,28 +335,28 @@ const Index = ({ user }: { user: User }) => {
 				</Section>
 			</Suspense>
 		</Page>
-	)
-}
+	);
+};
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-	const supabase = createClient(context)
+	const supabase = createClient(context);
 
-	const { data, error } = await supabase.auth.getUser()
+	const { data, error } = await supabase.auth.getUser();
 
 	if (error || !data) {
 		return {
 			redirect: {
-				destination: '/login',
+				destination: "/login",
 				permanent: false,
 			},
-		}
+		};
 	}
 
 	return {
 		props: {
 			user: data.user,
 		},
-	}
+	};
 }
 
-export default Index
+export default Index;
