@@ -312,6 +312,8 @@ const Index = ({ user }: { user: User }) => {
 								return
 							}
 
+							//TODO fix insert bug
+
 
 							const { data, error } = await supabase.functions.invoke(
 								'insert_workout',

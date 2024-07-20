@@ -10,8 +10,8 @@ interface EditableHeaderProps {
 export function EditableHeader({ initialText, onSave }: EditableHeaderProps) {
 	const [isEditing, setIsEditing] = useState(false);
 
-	const handleSave = (value) => {
-		onSave(value);
+	const handleSave = () => {
+		onSave((document.getElementById('workoutName') as HTMLInputElement).value);
 		setIsEditing(false);
 	};
 
@@ -20,8 +20,8 @@ export function EditableHeader({ initialText, onSave }: EditableHeaderProps) {
 			{isEditing ? (
 				<div className="mr-2">
 					<Input
+						id='workoutName'
 						defaultValue={initialText}
-						onChange={(e) => handleSave(e.target.value)}
 						className="text-2xl font-bold"
 					/>
 				</div>
