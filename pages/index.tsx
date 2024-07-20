@@ -23,13 +23,7 @@ const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),
 	name: 'New Workout',
 	date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
-	exercises: [
-		{
-			id: uuidv4(),
-			name: 'N/A',
-			sets: [{ id: uuidv4(), weight: 0, reps: 0 }],
-		},
-	],
+	exercises: [],
 }
 
 interface ExerciseSet {
@@ -147,6 +141,12 @@ const Index = ({ user }: { user: User }) => {
 			if (error) {
 				console.error('Error fetching workout:', error)
 				return defaultWorkoutData
+			}
+
+			if (!data.workout) {
+				setWorkout(defaultWorkoutData);
+
+				return;
 			}
 
 			setWorkout(data.workout)
