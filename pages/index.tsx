@@ -180,27 +180,39 @@ const Index = ({ user }: { user: User }) => {
 						return (
 							<>
 								<div className="mt-5" key={exercise.id}>
-									<DynamicSelect
-										options={allExercises}
-										placeholder={exercise.name}
-										onAddOption={(newExercise) => {
-											setAllExercises([...allExercises, newExercise]);
-										}}
-										onSelect={(value) => {
-											const newExercises = workout.exercises.map((exercise) => {
-												if (exercise.name === "N/A") {
-													exercise.name = value;
-												}
+									<div className="flex">
+										<DynamicSelect
+											options={allExercises}
+											placeholder={exercise.name}
+											onAddOption={(newExercise) => {
+												setAllExercises([...allExercises, newExercise]);
+											}}
+											onSelect={(value) => {
+												const newExercises = workout.exercises.map(
+													(exercise) => {
+														if (exercise.name === "N/A") {
+															exercise.name = value;
+														}
 
-												return exercise;
-											});
+														return exercise;
+													},
+												);
 
-											setWorkout({ ...workout, exercises: newExercises });
-										}}
-									/>
+												setWorkout({ ...workout, exercises: newExercises });
+											}}
+										/>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="ml-5"
+											onClick={() => handleRemoveExercise(exercise.id)}
+										>
+											<i className="bi bi-trash3"></i>
+										</Button>
+									</div>
 
 									{exercise.sets.map((set, i) => {
-										return (				
+										return (
 											<SetInput
 												key={set.id}
 												set={set}
