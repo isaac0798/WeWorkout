@@ -34,9 +34,8 @@ export function DynamicSelect({
 	onSelect,
 	placeholder = "Select an option",
 }: DynamicSelectProps) {
-	const [newOptionName, setNewOptionName] = useState("");
-
 	const handleAddOption = () => {
+		const newOptionName = (document.getElementById('workoutName') as HTMLInputElement).value
 		if (newOptionName.trim()) {
 			const newOption = {
 				id: uuidv4(),
@@ -49,7 +48,7 @@ export function DynamicSelect({
 	};
 
 	return (
-		<div className="space-y-2 w-3/5">
+		<div className='space-y-2 w-3/5'>
 			<Select onValueChange={onSelect}>
 				<SelectTrigger>
 					<SelectValue placeholder={placeholder} />
@@ -63,20 +62,20 @@ export function DynamicSelect({
 					<Popover>
 						<PopoverTrigger asChild>
 							<Button
-								variant="ghost"
-								size="icon"
-								className="w-full justify-start"
+								variant='ghost'
+								size='icon'
+								className='w-full justify-start'
 							>
-								<i className="bi bi-plus-lg"></i>
+								<i className='bi bi-plus-lg'></i>
 								Add New
 							</Button>
 						</PopoverTrigger>
-						<PopoverContent className="w-80">
-							<div className="flex flex-col space-y-2">
+						<PopoverContent className='w-80'>
+							<div className='flex flex-col space-y-2'>
 								<Input
-									value={newOptionName}
-									onChange={(e) => setNewOptionName(e.target.value)}
-									placeholder="New option name"
+									id='newExerciseName'
+									placeholder='New option name'
+									onKeyDown={(e) => e.stopPropagation()}
 								/>
 								<Button onClick={handleAddOption}>Add</Button>
 							</div>
@@ -85,5 +84,5 @@ export function DynamicSelect({
 				</SelectContent>
 			</Select>
 		</div>
-	);
+	)
 }
