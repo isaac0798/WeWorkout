@@ -18,6 +18,7 @@ import { DynamicSelect } from "@/components/DynamicSelect";
 import { EditableHeader } from "@/components/EditableHeader";
 import getAllExercisesForUser from "@/lib/getAllExerciseForUsers";
 import removeExercise from "@/lib/removeExercise";
+import SaveButton from "@/components/SaveWorkoutButton";
 
 const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),
@@ -155,127 +156,127 @@ const Index = ({ user }: { user: User }) => {
 		<Page>
 			<Section>
 				<Calendar
-					mode="single"
+					mode='single'
 					selected={date}
 					onSelect={setDate}
-					className="rounded-md border"
+					className='rounded-md border'
 				/>
 			</Section>
 			<Suspense fallback={<h1>Loading....</h1>}>
 				<Section>
 					<EditableHeader
-						initialText={workout?.name || "New Workout"}
+						initialText={workout?.name || 'New Workout'}
 						onSave={(newWorkoutName) => {
 							setWorkout({
 								...workout,
 								name: newWorkoutName,
-							});
+							})
 						}}
 					/>
 					{workout?.exercises?.map((exercise) => {
 						return (
 							<>
-								<div className="mt-5" key={exercise.id}>
+								<div className='mt-5' key={exercise.id}>
 									<DynamicSelect
 										options={allExercises}
 										placeholder={exercise.name}
 										onAddOption={(newExercise) => {
-											setAllExercises([...allExercises, newExercise]);
+											setAllExercises([...allExercises, newExercise])
 										}}
 										onSelect={(value) => {
 											const newExercises = workout.exercises.map((exercise) => {
-												if (exercise.name === "N/A") {
-													exercise.name = value;
+												if (exercise.name === 'N/A') {
+													exercise.name = value
 												}
 
-												return exercise;
-											});
+												return exercise
+											})
 
-											setWorkout({ ...workout, exercises: newExercises });
+											setWorkout({ ...workout, exercises: newExercises })
 										}}
 									/>
 
 									{exercise.sets.map((set, i) => {
 										return (
-											<div className="flex items-center mt-5" key={set.id}>
-												<div className="flex flex-col justify-center items-start w-1/3 pr-5">
-													<Label htmlFor="reps">Reps</Label>
+											<div className='flex items-center mt-5' key={set.id}>
+												<div className='flex flex-col justify-center items-start w-1/3 pr-5'>
+													<Label htmlFor='reps'>Reps</Label>
 													<Input
-														className="mt-2"
+														className='mt-2'
 														value={set.reps}
 														onChange={(e) => {
 															const newWorkout = updateSet(
 																workout,
 																exercise.id,
 																i,
-																"reps",
+																'reps',
 																e.target.value,
-															);
-															setWorkout(newWorkout);
+															)
+															setWorkout(newWorkout)
 														}}
 													/>
 												</div>
-												<div className="flex flex-col justify-center items-start w-1/3 pr-5">
-													<Label htmlFor="weights">Weight</Label>
+												<div className='flex flex-col justify-center items-start w-1/3 pr-5'>
+													<Label htmlFor='weights'>Weight</Label>
 													<Input
-														className="mt-2"
+														className='mt-2'
 														value={set.weight}
 														onChange={(e) => {
 															const newWorkout = updateSet(
 																workout,
 																exercise.id,
 																i,
-																"weight",
+																'weight',
 																e.target.value,
-															);
-															setWorkout(newWorkout);
+															)
+															setWorkout(newWorkout)
 														}}
 													/>
 												</div>
 												<Button
-													variant="ghost"
-													size="icon"
-													className="mt-5"
+													variant='ghost'
+													size='icon'
+													className='mt-5'
 													onClick={() => removeSetFromExercise(exercise.id, i)}
 												>
-													<i className="bi bi-trash3"></i>
+													<i className='bi bi-trash3'></i>
 												</Button>
 											</div>
-										);
+										)
 									})}
 
 									<Button
-										className="mt-5"
+										className='mt-5'
 										onClick={() => {
-											const newSet = { id: uuidv4(), weight: 0, reps: 0 };
+											const newSet = { id: uuidv4(), weight: 0, reps: 0 }
 
-											addSetToExercise(exercise.id, newSet);
+											addSetToExercise(exercise.id, newSet)
 										}}
 									>
 										Add Set
 									</Button>
 								</div>
 							</>
-						);
+						)
 					})}
 				</Section>
 				<Section>
 					<Button
 						onClick={() => {
 							if (!workout) {
-								setWorkout(defaultWorkoutData);
+								setWorkout(defaultWorkoutData)
 
-								return;
+								return
 							}
 
 							const unFilledExercise = workout.exercises?.some(
-								(exercise) => exercise.name === "N/A",
-							);
+								(exercise) => exercise.name === 'N/A',
+							)
 
 							if (unFilledExercise) {
-								alert("Fill in all exercises pls before adding more");
+								alert('Fill in all exercises pls before adding more')
 
-								return;
+								return
 							}
 
 							setWorkout({
@@ -284,50 +285,20 @@ const Index = ({ user }: { user: User }) => {
 									...workout.exercises,
 									{
 										id: uuidv4(),
-										name: "N/A",
+										name: 'N/A',
 										sets: [{ id: uuidv4(), weight: 0, reps: 0 }],
 									},
 								],
-							});
+							})
 						}}
 					>
 						Add Exercise
 					</Button>
-					<Button
-						className="ml-5"
-						onClick={async () => {
-							const unFilledExercise = workout.exercises?.some(
-								(exercise) => exercise.name === "N/A",
-							);
-
-							if (unFilledExercise) {
-								alert("Fill in all exercises pls");
-
-								return;
-							}
-
-							//TODO fix insert bug
-
-							const { data, error } = await supabase.functions.invoke(
-								"insert_workout",
-								{
-									body: JSON.stringify({
-										workoutData: workout,
-										userId: user.id,
-									}),
-								},
-							);
-
-							if (error) console.error("Error:", error);
-							else console.log("Success:", data);
-						}}
-					>
-						Save
-					</Button>
+					<SaveButton workout={workout} user={user} supabase={supabase} />
 				</Section>
 			</Suspense>
 		</Page>
-	);
+	)
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
