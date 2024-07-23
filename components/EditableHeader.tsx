@@ -16,26 +16,29 @@ export function EditableHeader({ initialText, onSave }: EditableHeaderProps) {
 	};
 
 	return (
-		<div className="flex items-center bg-black-100">
+		<div className='flex items-center bg-black-100'>
 			{isEditing ? (
-				<div className="mr-2">
+				<div className='mr-2'>
 					<Input
-						id="workoutName"
+						id='workoutName'
 						defaultValue={initialText}
-						className="text-2xl font-bold"
+						className='text-2xl font-bold'
 					/>
 				</div>
 			) : (
-				<h1 className="text-2xl font-bold">{initialText}</h1>
+				<h1 className='text-2xl font-bold'>{initialText}</h1>
 			)}
 
 			{isEditing ? (
 				<Button onClick={handleSave}>Save</Button>
 			) : (
-				<Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
-					<i className="bi bi-pencil"></i>
+				<Button variant='ghost' size='icon' onClick={() => setIsEditing(true)}>
+					<i className='bi bi-pencil'></i>
 				</Button>
 			)}
+			<Button variant='ghost' size='icon' onClick={() => console.log('load templates')}>
+				<i className='bi bi-cloud-arrow-down'></i>
+			</Button>
 		</div>
-	);
+	)
 }

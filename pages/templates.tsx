@@ -11,7 +11,7 @@ import { User } from "@supabase/supabase-js";
 export interface Template {
 	id: string;
 	name: string;
-	exercise: Exercise[];
+	exercises: Exercise[];
 }
 
 let TEMPLATES: Template[] = [];
@@ -28,7 +28,7 @@ export default function PublicPage({ user }: { user: User }) {
 		{ id: string; name: string }[]
 	>([]);
 
-	const [templates, setTemplates] = useState([]);
+	const [templates, setTemplates] = useState<Template[]>([]);
 
 	useEffect(() => {
 		supabase
@@ -84,7 +84,12 @@ export default function PublicPage({ user }: { user: User }) {
 			</Button>
 			<p>Existing Templates:</p>
 			{templates.map((template, i) => {
-				return <div>Template: {template.name}</div>;
+				return (
+          <>
+            <div>Template: {template.name}</div>
+            {template.exercises.map(template => <div>{template.name}</div>)}
+          </>
+        )
 			})}
 		</Page>
 	);
