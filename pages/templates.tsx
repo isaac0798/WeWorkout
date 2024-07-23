@@ -42,6 +42,23 @@ export default function PublicPage({ user }: { user: User }) {
 				}
 				setAllExercises(data);
 			});
+
+      async function getAllTemplatesForUser() {
+        const { data, error} =
+					await supabase.rpc('get_templates_for_user', {
+						p_user_id: user.id,
+					})
+
+        if (error) {
+          console.log(error)
+
+          return;
+        }
+
+        setTemplates(data)
+      }
+
+      getAllTemplatesForUser();
 	}, []);
 
 	return (
@@ -55,6 +72,9 @@ export default function PublicPage({ user }: { user: User }) {
 						{
 							body: JSON.stringify({
 								userId: user.id,
+                templateId: uuidv4(),
+                name: 'test-templates',
+                exercises: allExercises.map(exercise => exercise.id)
 							}),
 						},
 					)
@@ -63,8 +83,8 @@ export default function PublicPage({ user }: { user: User }) {
 				Add New Template
 			</Button>
 			<p>Existing Templates:</p>
-			{TEMPLATES.map((template, i) => {
-				return <div>Template {i}</div>;
+			{templates.map((template, i) => {
+				return <div>Template: {template.name}</div>;
 			})}
 		</Page>
 	);

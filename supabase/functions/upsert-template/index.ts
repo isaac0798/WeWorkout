@@ -41,14 +41,14 @@ Deno.serve(async (req) => {
 	}
 
 	// Get the request body
-	const { workoutData, userId } = await req.json()
+	const { templateId, userId, name, exercises } = await req.json()
 
 	// Start a database transaction
 	const { data, error } = await supabase.rpc('upsert_template', {
-    p_template_id: null,
-    p_name: 'My Workout Template',
+    p_template_id: templateId,
+    p_name: name,
     p_user_id: userId,
-    p_exercises: [{ name: 'Squats' }, { name: 'Bench Press' }, { name: 'Deadlifts' }]
+    p_exercises: exercises
   })
 
 	if (error) {
