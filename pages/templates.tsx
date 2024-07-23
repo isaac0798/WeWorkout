@@ -6,6 +6,7 @@ import { GetServerSideProps, type GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Exercise } from ".";
+import { User } from "@supabase/supabase-js";
 
 export interface Template {
 	id: string;
@@ -13,21 +14,21 @@ export interface Template {
 	exercise: Exercise[];
 }
 
-const TEMPLATES: Template[] = [];
+let TEMPLATES: Template[] = [];
 
 const defaultTemplate = {
 	name: "New Workout",
 	exercises: [],
 };
 
-export default function PublicPage({ data }: { data?: any[] }) {
+export default function PublicPage({ user }: { user: User }) {
 	const supabase = createFEClient();
 
 	const [allExercises, setAllExercises] = useState<
 		{ id: string; name: string }[]
 	>([]);
 
-	const [templates, setTemplates] = useState(TEMPLATES);
+	const [templates, setTemplates] = useState([]);
 
 	useEffect(() => {
 		supabase
@@ -47,15 +48,16 @@ export default function PublicPage({ data }: { data?: any[] }) {
 		<Page>
 			<h1>Templates</h1>
 			<Button
-				onClick={() => {
-					setTemplates([
-						...templates,
+				onClick={async () => {
+          console.log('template')
+          const { data, error } = await supabase.functions.invoke(
+						'upsert-template',
 						{
-							id: uuidv4(),
-							name: "New Template",
-							exercise: [],
+							body: JSON.stringify({
+								userId: user.id,
+							}),
 						},
-					]);
+					)
 				}}
 			>
 				Add New Template
