@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Exercise } from ".";
 import { User } from "@supabase/supabase-js";
+import { Separator } from "@/components/ui/separator";
 
 export interface Template {
 	id: string;
@@ -82,14 +83,21 @@ export default function PublicPage({ user }: { user: User }) {
 			>
 				Add New Template
 			</Button>
-			<p>Existing Templates:</p>
+			<p className="mt-10">Existing Templates:</p>
 			{templates.map((template, i) => {
 				return (
-          <>
-            <div>Template: {template.name}</div>
-            {template.exercises.map(template => <div>{template.name}</div>)}
-          </>
-        )
+					<>
+						<div>{template.name}</div>
+						<div className="flex">
+							{template.exercises.map((exercise) => (
+								<div className="flex">
+									<div>{exercise.name}</div>
+									<Separator className="mx-4" orientation='vertical' />
+								</div>
+							))}
+						</div>
+					</>
+				)
 			})}
 		</Page>
 	);
