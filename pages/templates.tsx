@@ -9,6 +9,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import { createFEClient } from "@/utils/supabase/component";
 import { createClient } from "@/utils/supabase/server-props";
 import type { User } from "@supabase/supabase-js";
@@ -16,7 +17,6 @@ import { GetServerSideProps, type GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Exercise } from ".";
-import { cn } from "@/lib/utils";
 
 export interface Template {
 	id: string;
@@ -37,7 +37,6 @@ export default function PublicPage({ user }: { user: User }) {
 	const [allExercises, setAllExercises] = useState<
 		{ id: string; name: string }[]
 	>([]);
-
 
 	const [isSuccess, setIsSuccess] = useState(false);
 
@@ -61,23 +60,20 @@ export default function PublicPage({ user }: { user: User }) {
 			exercises: selectedExercises,
 		});
 
-    const newTemplate = {
+		const newTemplate = {
 			userId: user.id,
 			templateId: uuidv4(),
 			name: templateName,
 			exercises: selectedExercises,
-		}
+		};
 
-     const { data, error } = await supabase.functions.invoke(
-				'upsert-template',
-				{
-					body: JSON.stringify(newTemplate),
-				},
-			)
+		const { data, error } = await supabase.functions.invoke("upsert-template", {
+			body: JSON.stringify(newTemplate),
+		});
 
-        if (error) throw error;
-        setIsSuccess(true)
-				setTimeout(() => setIsSuccess(false), 2000) 
+		if (error) throw error;
+		setIsSuccess(true);
+		setTimeout(() => setIsSuccess(false), 2000);
 	};
 
 	useEffect(() => {
@@ -113,56 +109,58 @@ export default function PublicPage({ user }: { user: User }) {
 	return (
 		<Page>
 			<h1>Templates</h1>
-			<div className='flex justify-between'>
-				<div className='flex flex-col'>
+			<div className="flex justify-between">
+				<div className="flex flex-col">
 					<Input
-						placeholder='Template Name'
+						placeholder="Template Name"
 						value={templateName}
 						onChange={(e) => setTemplateName(e.target.value)}
 					/>
 					{selectedExercises.map((exerciseId, index) => (
-						<div key={index} className='flex items-center space-x-2'>
+						<div key={index} className="flex items-center space-x-2">
 							<Select
 								value={exerciseId}
 								onValueChange={(value) => {
-									const newExercises = [...selectedExercises]
-									newExercises[index] = value
-									setSelectedExercises(newExercises)
+									const newExercises = [...selectedExercises];
+									newExercises[index] = value;
+									setSelectedExercises(newExercises);
 								}}
 							>
-								<SelectTrigger className='w-[180px] mt-5'>
-									<SelectValue placeholder='Pick an Exercise' />
+								<SelectTrigger className="w-[180px] mt-5">
+									<SelectValue placeholder="Pick an Exercise" />
 								</SelectTrigger>
 								<SelectContent>
 									{allExercises.map((exercise) => {
 										return (
-											<SelectItem value={exercise.id}>
+											<SelectItem key={exercise.id} value={exercise.id}>
 												{exercise.name}
 											</SelectItem>
-										)
+										);
 									})}
 								</SelectContent>
 							</Select>
 						</div>
 					))}
 					<Button
-						variant='outline'
-						onClick={() => handleAddExercise('')}
-						className='w-full my-5'
+						variant="outline"
+						onClick={() => handleAddExercise("")}
+						className="w-full my-5"
 					>
 						Add Exercise
 					</Button>
+				</div>
+				<div>
 					<Button
 						className={cn(
-							'transition-colors duration-300',
-							isSuccess && 'bg-green-500 hover:bg-green-600',
+							"transition-colors duration-300",
+							isSuccess && "bg-green-500 hover:bg-green-600",
 						)}
 						onClick={handleCreateTemplate}
 					>
 						Save
 					</Button>
 				</div>
-				<div>
+				{/* 				<div>
 					<h1>Existing Templates:</h1>
 					{templates?.map((template, i) => {
 						return (
@@ -181,10 +179,10 @@ export default function PublicPage({ user }: { user: User }) {
 							</>
 						)
 					})}
-				</div>
+				</div> */}
 			</div>
 		</Page>
-	)
+	);
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {

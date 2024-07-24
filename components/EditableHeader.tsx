@@ -80,6 +80,7 @@ export function EditableHeader({
 						<CardContent>
 							{templates.map((template) => (
 								<Button
+									key={template.id}
 									variant="outline"
 									onClick={() => {
 										const exercises = template.exercises.map((exercise) => {
