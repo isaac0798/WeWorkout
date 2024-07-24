@@ -16,6 +16,7 @@ import { GetServerSideProps, type GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Exercise } from ".";
+import { cn } from "@/lib/utils";
 
 export interface Template {
 	id: string;
@@ -37,6 +38,9 @@ export default function PublicPage({ user }: { user: User }) {
 		{ id: string; name: string }[]
 	>([]);
 
+
+	const [isSuccess, setIsSuccess] = useState(false);
+
 	const [templateName, setTemplateName] = useState("");
 	const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
 
@@ -57,17 +61,23 @@ export default function PublicPage({ user }: { user: User }) {
 			exercises: selectedExercises,
 		});
 
+    const newTemplate = {
+			userId: user.id,
+			templateId: uuidv4(),
+			name: templateName,
+			exercises: selectedExercises,
+		}
+
      const { data, error } = await supabase.functions.invoke(
 				'upsert-template',
 				{
-					body: JSON.stringify({
-						userId: user.id,
-						templateId: uuidv4(),
-						name: templateName,
-						exercises: selectedExercises,
-					}),
+					body: JSON.stringify(newTemplate),
 				},
 			)
+
+        if (error) throw error;
+        setIsSuccess(true)
+				setTimeout(() => setIsSuccess(false), 2000) 
 	};
 
 	useEffect(() => {
@@ -105,7 +115,6 @@ export default function PublicPage({ user }: { user: User }) {
 			<h1>Templates</h1>
 			<div className='flex justify-between'>
 				<div className='flex flex-col'>
-					<Button onClick={handleCreateTemplate}>Add New Template</Button>
 					<Input
 						placeholder='Template Name'
 						value={templateName}
@@ -121,7 +130,7 @@ export default function PublicPage({ user }: { user: User }) {
 									setSelectedExercises(newExercises)
 								}}
 							>
-								<SelectTrigger className='w-[180px]'>
+								<SelectTrigger className='w-[180px] mt-5'>
 									<SelectValue placeholder='Pick an Exercise' />
 								</SelectTrigger>
 								<SelectContent>
@@ -139,9 +148,18 @@ export default function PublicPage({ user }: { user: User }) {
 					<Button
 						variant='outline'
 						onClick={() => handleAddExercise('')}
-						className='w-full'
+						className='w-full my-5'
 					>
 						Add Exercise
+					</Button>
+					<Button
+						className={cn(
+							'transition-colors duration-300',
+							isSuccess && 'bg-green-500 hover:bg-green-600',
+						)}
+						onClick={handleCreateTemplate}
+					>
+						Save
 					</Button>
 				</div>
 				<div>
