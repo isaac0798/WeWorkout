@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
     p_template_id: templateId,
     p_name: name,
     p_user_id: userId,
-    p_exercises: exercises
+    p_exercise_ids: exercises
   })
 
 	if (error) {
