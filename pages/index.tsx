@@ -21,6 +21,7 @@ import SetInput from "@/components/SetInput";
 import { Checkbox } from "@/components/ui/checkbox";
 import getAllExercisesForUser from "@/lib/getAllExerciseForUsers";
 import removeExercise from "@/lib/removeExercise";
+import type { Template } from "./templates";
 
 const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),
@@ -56,6 +57,8 @@ const Index = ({ user }: { user: User }) => {
 	const [allExercises, setAllExercises] = useState<
 		{ id: string; name: string }[]
 	>([]);
+
+	const [templates, setTemplates] = useState<Template[]>([]);
 
 	function updateSet(
 		workoutData: WorkoutData,
@@ -122,6 +125,22 @@ const Index = ({ user }: { user: User }) => {
 				}
 				setAllExercises(data);
 			});
+
+		async function getAllTemplatesForUser() {
+			const { data, error } = await supabase.rpc("get_templates_for_user", {
+				p_user_id: user.id,
+			});
+
+			if (error) {
+				console.log(error);
+
+				return;
+			}
+
+			setTemplates(data);
+		}
+
+		getAllTemplatesForUser();
 	}, []);
 
 	useEffect(() => {
@@ -175,6 +194,9 @@ const Index = ({ user }: { user: User }) => {
 								name: newWorkoutName,
 							});
 						}}
+						templates={templates}
+						setWorkout={setWorkout}
+						workout={workout}
 					/>
 					{workout?.exercises?.map((exercise) => {
 						return (
