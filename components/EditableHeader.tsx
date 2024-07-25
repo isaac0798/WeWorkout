@@ -32,7 +32,6 @@ export function EditableHeader({
 	setWorkout,
 	workout,
 }: EditableHeaderProps) {
-	const supabase = createFEClient();
 	const [isEditing, setIsEditing] = useState(false);
 
 	const handleSave = () => {
@@ -63,13 +62,7 @@ export function EditableHeader({
 			)}
 			<Popover>
 				<PopoverTrigger>
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={() => console.log("load templates")}
-					>
-						<i className="bi bi-cloud-arrow-down"></i>
-					</Button>
+					<i className="bi bi-cloud-arrow-down"></i>
 				</PopoverTrigger>
 				<PopoverContent className="w-80">
 					<Card>

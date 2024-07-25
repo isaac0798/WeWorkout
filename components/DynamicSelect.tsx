@@ -34,9 +34,9 @@ export function DynamicSelect({
 	onSelect,
 	placeholder = "Select an option",
 }: DynamicSelectProps) {
-	const handleAddOption = () => {
+	const handleAddOption = async () => {
 		const newOptionName = (
-			document.getElementById("workoutName") as HTMLInputElement
+			document.getElementById("newExerciseName") as HTMLInputElement
 		).value;
 		if (newOptionName.trim()) {
 			const newOption = {
@@ -44,8 +44,12 @@ export function DynamicSelect({
 				name: newOptionName.replace(/\s+/g, "-"),
 			};
 
-			addExerciseToSupabase(newOption.name);
-			onAddOption(newOption);
+			const { error } = await addExerciseToSupabase(newOption.name);
+			if (!error) {
+				onAddOption(newOption);
+			} else {
+				alert("Exercise exists");
+			}
 		}
 	};
 
@@ -56,11 +60,13 @@ export function DynamicSelect({
 					<SelectValue placeholder={placeholder} />
 				</SelectTrigger>
 				<SelectContent>
-					{options.map((option) => (
-						<SelectItem key={option.name} value={option.name}>
-							{option.name}
-						</SelectItem>
-					))}
+					{options
+						.filter((option) => option.name !== placeholder)
+						.map((option) => (
+							<SelectItem key={option.name} value={option.name}>
+								{option.name}
+							</SelectItem>
+						))}
 					<Popover>
 						<PopoverTrigger asChild>
 							<Button
