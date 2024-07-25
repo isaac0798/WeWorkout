@@ -39,32 +39,32 @@ export default function PublicPage({ user }: { user: User }) {
 		{ id: string; name: string }[]
 	>([])
 
-	const [isSuccess, setIsSuccess] = useState(false)
+	/* 	const [isSuccess, setIsSuccess] = useState(false);
 
-	const [templateName, setTemplateName] = useState('')
-	const [selectedExercises, setSelectedExercises] = useState<string[]>([])
+	const [templateName, setTemplateName] = useState("");
+	const [selectedExercises, setSelectedExercises] = useState<string[]>([]); */
 
 	const [templates, setTemplates] = useState<Template[]>([])
 
-	const handleAddExercise = (exerciseId: string) => {
-		setSelectedExercises([...selectedExercises, exerciseId])
-	}
+	/* 	const handleAddExercise = (exerciseId: string) => {
+		setSelectedExercises([...selectedExercises, exerciseId]);
+	};
 
 	const handleRemoveExercise = (id: string) => {
 		setSelectedExercises(
 			selectedExercises.filter((exercise) => exercise !== id),
-		)
-	}
+		);
+	};
 
 	const handleCreateTemplate = async () => {
 		// Here you would call your backend to create the template
-		console.log('Creating template:', {
+		console.log("Creating template:", {
 			name: templateName,
 			exercises: selectedExercises,
-		})
+		});
 
 		if (!templateName || !selectedExercises.length) {
-			return
+			return;
 		}
 
 		const newTemplate = {
@@ -72,20 +72,20 @@ export default function PublicPage({ user }: { user: User }) {
 			templateId: uuidv4(),
 			name: templateName,
 			exercises: selectedExercises,
-		}
+		};
 
-		const { data, error } = await supabase.functions.invoke('upsert-template', {
+		const { data, error } = await supabase.functions.invoke("upsert-template", {
 			body: JSON.stringify(newTemplate),
-		})
+		});
 
-		if (error) throw error
-		setIsSuccess(true)
+		if (error) throw error;
+		setIsSuccess(true);
 		setTimeout(() => {
-			setIsSuccess(false)
-			setTemplateName('')
-			setSelectedExercises([])
-		}, 2000)
-	}
+			setIsSuccess(false);
+			setTemplateName("");
+			setSelectedExercises([]);
+		}, 2000);
+	}; */
 
 	useEffect(() => {
 		supabase
@@ -115,95 +115,33 @@ export default function PublicPage({ user }: { user: User }) {
 		}
 
 		getAllTemplatesForUser()
-	}, [isSuccess])
+	}, [])
 
 	return (
 		<Page>
-			<h1>Templates</h1>
-			<div className='flex justify-between'>
+			<div className='flex flex-col justify-between'>
+				<h1>Existing Templates:</h1>
 				<div className='flex flex-col'>
-					<Input
-						placeholder='Template Name'
-						value={templateName}
-						onChange={(e) => setTemplateName(e.target.value)}
-					/>
-					{selectedExercises.map((exerciseId, index) => (
-						<div key={index} className='flex items-center space-x-2'>
-							<Select
-								value={exerciseId}
-								onValueChange={(value) => {
-									const newExercises = [...selectedExercises]
-									newExercises[index] = value
-									setSelectedExercises(newExercises)
-								}}
-							>
-								<SelectTrigger className='w-[180px] mt-5'>
-									<SelectValue placeholder='Pick an Exercise' />
-								</SelectTrigger>
-								<Button
-									variant='ghost'
-									size='icon'
-									className='mt-5'
-									onClick={() => {
-										handleRemoveExercise(exerciseId)
-									}}
-								>
-									<i className='bi bi-trash3'></i>
-								</Button>
-								<SelectContent>
-									{allExercises.map((exercise) => {
-										return (
-											<>
-												<SelectItem key={exercise.id} value={exercise.id}>
-													{exercise.name}
-												</SelectItem>
-											</>
-										)
-									})}
-								</SelectContent>
-							</Select>
-						</div>
-					))}
-					<Button
-						variant='outline'
-						onClick={() => handleAddExercise('')}
-						className='w-full my-5'
-					>
-						Add Exercise
-					</Button>
-				</div>
-				<div className='flex flex-col'>
-					<Button
-						className={cn(
-							'transition-colors duration-300',
-							isSuccess && 'bg-green-500 hover:bg-green-600',
-						)}
-						onClick={handleCreateTemplate}
-					>
-						Save
-					</Button>
-					<Button className='mt-5' variant='link'>
-						<Link href='/viewtemplates'>View All Templates</Link>
-					</Button>
-					{/* 
-					<h1>Existing Templates:</h1>
 					{templates?.map((template, i) => {
 						return (
-							<>
+							<div className='mt-5'>
 								<div>
 									{i + 1}. {template.name}
 								</div>
-								<div className="flex">
+								<div className='flex'>
 									{template?.exercises?.map((exercise) => (
-										<div className="flex">
+										<div className='flex'>
 											<div>{exercise.name}</div>
-											<Separator className="mx-4" orientation="vertical" />
+											<Separator className='mx-4' orientation='vertical' />
 										</div>
 									))}
 								</div>
-							</>
-						);
-					})} */}
+							</div>
+						)
+					})}
+					<Button className='mt-5' variant='link'>
+						<Link href='/templates'>Back</Link>
+					</Button>
 				</div>
 			</div>
 		</Page>
