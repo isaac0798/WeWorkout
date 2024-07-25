@@ -60,7 +60,7 @@ export default function PublicPage({ user }: { user: User }) {
       userId: user.id,
       templateId: template?.id,
       name: template?.name,
-      exercises: template?.exercises.map(exercise => exercise.id)
+      exercises: template?.exercises.map(exercise => exercise.id).filter(Boolean)
     }
 
     const { data, error } = await supabase.functions.invoke('upsert-template', {
@@ -145,6 +145,19 @@ export default function PublicPage({ user }: { user: User }) {
 		getTemplateWithExercises(router.query.id)
 	}, [])
 
+  const handleAddExercise = (exerciseId: string, order: number) => {
+    if (!template || !template.exercises) {
+      return;
+    }
+
+    console.log('hello')
+    setTemplate({...template, exercises: [...template?.exercises, {
+      id: exerciseId,
+      name: 'New Exercise',
+      order
+    }]})
+  }
+
 	if (error) return <div>Error: {error}</div>
 	if (!template) return <div>Loading...</div>
 
@@ -209,7 +222,7 @@ export default function PublicPage({ user }: { user: User }) {
 			</ul>
 			<Button
 				variant='outline'
-				onClick={() => console.log('handle exercise')}
+				onClick={() => handleAddExercise('', template.exercises.length + 1)}
 				className='w-full my-5'
 			>
 				Add Exercise
