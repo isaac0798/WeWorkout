@@ -124,7 +124,7 @@ export default function PublicPage({ user }: { user: User }) {
 				<div className="flex flex-col">
 					{templates?.map((template, i) => {
 						return (
-							<div className="mt-5">
+							<div className="mt-5" key={template.id}>
 								<div className="flex items-center">
 									{i + 1}. {template.name}
 									<Button className="w-2/5" variant="ghost" size="icon">
@@ -137,7 +137,7 @@ export default function PublicPage({ user }: { user: User }) {
 								</div>
 								<div className="flex">
 									{template?.exercises?.map((exercise) => (
-										<div className="flex">
+										<div className="flex" key={exercise.id}>
 											<div>{exercise.name}</div>
 											<Separator className="mx-4" orientation="vertical" />
 										</div>
