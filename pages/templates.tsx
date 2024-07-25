@@ -60,9 +60,9 @@ export default function PublicPage({ user }: { user: User }) {
 			exercises: selectedExercises,
 		});
 
-    if (!templateName || !selectedExercises.length) {
-      return;
-    }
+		if (!templateName || !selectedExercises.length) {
+			return;
+		}
 
 		const newTemplate = {
 			userId: user.id,
@@ -77,7 +77,11 @@ export default function PublicPage({ user }: { user: User }) {
 
 		if (error) throw error;
 		setIsSuccess(true);
-		setTimeout(() => setIsSuccess(false), 2000);
+		setTimeout(() => {
+      setIsSuccess(false)
+      setTemplateName('')
+      setSelectedExercises([])
+    }, 2000);
 	};
 
 	useEffect(() => {
@@ -108,7 +112,7 @@ export default function PublicPage({ user }: { user: User }) {
 		}
 
 		getAllTemplatesForUser();
-	}, []);
+	}, [isSuccess]);
 
 	return (
 		<Page>
@@ -163,8 +167,7 @@ export default function PublicPage({ user }: { user: User }) {
 					>
 						Save
 					</Button>
-				</div>
-				{/* 				<div>
+{/* 
 					<h1>Existing Templates:</h1>
 					{templates?.map((template, i) => {
 						return (
@@ -172,18 +175,18 @@ export default function PublicPage({ user }: { user: User }) {
 								<div>
 									{i + 1}. {template.name}
 								</div>
-								<div className='flex'>
+								<div className="flex">
 									{template?.exercises?.map((exercise) => (
-										<div className='flex'>
+										<div className="flex">
 											<div>{exercise.name}</div>
-											<Separator className='mx-4' orientation='vertical' />
+											<Separator className="mx-4" orientation="vertical" />
 										</div>
 									))}
 								</div>
 							</>
-						)
-					})}
-				</div> */}
+						);
+					})} */}
+				</div>
 			</div>
 		</Page>
 	);
