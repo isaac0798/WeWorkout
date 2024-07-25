@@ -49,8 +49,8 @@ export default function PublicPage({ user }: { user: User }) {
 		setSelectedExercises([...selectedExercises, exerciseId]);
 	};
 
-	const handleRemoveExercise = (index: number) => {
-		setSelectedExercises(selectedExercises.filter((_, i) => i !== index));
+	const handleRemoveExercise = (id: string) => {
+		setSelectedExercises(selectedExercises.filter((exercise) => exercise !== id));
 	};
 
 	const handleCreateTemplate = async () => {
@@ -117,42 +117,54 @@ export default function PublicPage({ user }: { user: User }) {
 	return (
 		<Page>
 			<h1>Templates</h1>
-			<div className="flex justify-between">
-				<div className="flex flex-col">
+			<div className='flex justify-between'>
+				<div className='flex flex-col'>
 					<Input
-						placeholder="Template Name"
+						placeholder='Template Name'
 						value={templateName}
 						onChange={(e) => setTemplateName(e.target.value)}
 					/>
 					{selectedExercises.map((exerciseId, index) => (
-						<div key={index} className="flex items-center space-x-2">
+						<div key={index} className='flex items-center space-x-2'>
 							<Select
 								value={exerciseId}
 								onValueChange={(value) => {
-									const newExercises = [...selectedExercises];
-									newExercises[index] = value;
-									setSelectedExercises(newExercises);
+									const newExercises = [...selectedExercises]
+									newExercises[index] = value
+									setSelectedExercises(newExercises)
 								}}
 							>
-								<SelectTrigger className="w-[180px] mt-5">
-									<SelectValue placeholder="Pick an Exercise" />
+								<SelectTrigger className='w-[180px] mt-5'>
+									<SelectValue placeholder='Pick an Exercise' />
 								</SelectTrigger>
+								<Button
+									variant='ghost'
+									size='icon'
+									className='mt-5'
+									onClick={() => {
+										handleRemoveExercise(exerciseId)
+									}}
+								>
+									<i className='bi bi-trash3'></i>
+								</Button>
 								<SelectContent>
 									{allExercises.map((exercise) => {
 										return (
-											<SelectItem key={exercise.id} value={exercise.id}>
-												{exercise.name}
-											</SelectItem>
-										);
+											<>
+												<SelectItem key={exercise.id} value={exercise.id}>
+													{exercise.name}
+												</SelectItem>
+											</>
+										)
 									})}
 								</SelectContent>
 							</Select>
 						</div>
 					))}
 					<Button
-						variant="outline"
-						onClick={() => handleAddExercise("")}
-						className="w-full my-5"
+						variant='outline'
+						onClick={() => handleAddExercise('')}
+						className='w-full my-5'
 					>
 						Add Exercise
 					</Button>
@@ -160,14 +172,14 @@ export default function PublicPage({ user }: { user: User }) {
 				<div>
 					<Button
 						className={cn(
-							"transition-colors duration-300",
-							isSuccess && "bg-green-500 hover:bg-green-600",
+							'transition-colors duration-300',
+							isSuccess && 'bg-green-500 hover:bg-green-600',
 						)}
 						onClick={handleCreateTemplate}
 					>
 						Save
 					</Button>
-{/* 
+					{/* 
 					<h1>Existing Templates:</h1>
 					{templates?.map((template, i) => {
 						return (
@@ -189,7 +201,7 @@ export default function PublicPage({ user }: { user: User }) {
 				</div>
 			</div>
 		</Page>
-	);
+	)
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
