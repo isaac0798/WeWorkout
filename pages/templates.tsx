@@ -60,6 +60,10 @@ export default function PublicPage({ user }: { user: User }) {
 			exercises: selectedExercises,
 		});
 
+    if (!templateName || !selectedExercises.length) {
+      return;
+    }
+
 		const newTemplate = {
 			userId: user.id,
 			templateId: uuidv4(),
