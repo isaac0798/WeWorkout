@@ -73,6 +73,7 @@ export function EditableHeader({
 						<CardContent>
 							{templates.map((template) => (
 								<Button
+									className="my-2"
 									key={template.id}
 									variant="outline"
 									onClick={() => {
