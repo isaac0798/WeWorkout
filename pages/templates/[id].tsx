@@ -158,6 +158,19 @@ export default function PublicPage({ user }: { user: User }) {
     }]})
   }
 
+  const handleRemoveExercise = (exerciseId: string) => {
+    if (!template) {
+      return;
+    }
+
+    const newExercises = template?.exercises.filter(exercise => exercise.id !== exerciseId)
+
+    setTemplate({
+      ...template,
+      exercises: newExercises
+    })
+  }
+
 	if (error) return <div>Error: {error}</div>
 	if (!template) return <div>Loading...</div>
 
@@ -200,7 +213,7 @@ export default function PublicPage({ user }: { user: User }) {
 								size='icon'
 								className='mt-5'
 								onClick={() => {
-									console.log('remove exercise')
+									handleRemoveExercise(exercise.id)
 								}}
 							>
 								<i className='bi bi-trash3'></i>
