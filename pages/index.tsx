@@ -212,18 +212,21 @@ const Index = ({ user }: { user: User }) => {
 											onSelect={(value) => {
 												const newExercises = workout.exercises.map(
 													(exercise2, j) => {
-														if (exercise2.name === 'N/A') {
-															exercise2.name = value
+														if (exercise2.name === "N/A") {
+															exercise2.name = value;
 
-															return exercise2
+															return exercise2;
 														}
 
 														if (i === j && exercise.name !== value) {
-															exercise2.name = value
-															exercise.id = allExercises.find((exercise3) => exercise3.name === value)?.id || ''
+															exercise2.name = value;
+															exercise.id =
+																allExercises.find(
+																	(exercise3) => exercise3.name === value,
+																)?.id || "";
 														}
 
-														return exercise2
+														return exercise2;
 													},
 												);
 

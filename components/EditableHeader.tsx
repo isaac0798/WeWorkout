@@ -62,7 +62,7 @@ export function EditableHeader({
 			)}
 			<Popover>
 				<PopoverTrigger>
-						<i className="bi bi-cloud-arrow-down"></i>
+					<i className="bi bi-cloud-arrow-down"></i>
 				</PopoverTrigger>
 				<PopoverContent className="w-80">
 					<Card>
