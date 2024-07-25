@@ -57,7 +57,6 @@ export default function PublicPage({ user }: { user: User }) {
 	};
 
 	const handleCreateTemplate = async () => {
-		// Here you would call your backend to create the template
 		console.log("Creating template:", {
 			name: templateName,
 			exercises: selectedExercises,

@@ -43,10 +43,36 @@ export default function PublicPage({ user }: { user: User }) {
 
 	const [template, setTemplate] = useState<Template>()
 	const [error, setError] = useState<string | null>(null)
+  const [isSuccess, setIsSuccess] = useState(false)
 
 	const [allExercises, setAllExercises] = useState<
 		{ id: string; name: string }[]
 	>([])
+
+  const handleSave = async () => {
+    if (!template) {
+      alert('error cant save template')
+
+      return
+    }
+
+    const updatedTemplate = {
+      userId: user.id,
+      templateId: template?.id,
+      name: template?.name,
+      exercises: template?.exercises.map(exercise => exercise.id)
+    }
+
+    const { data, error } = await supabase.functions.invoke('upsert-template', {
+			body: JSON.stringify(updatedTemplate),
+		})
+
+		if (error) throw error
+		setIsSuccess(true)
+		setTimeout(() => {
+			setIsSuccess(false)
+		}, 2000)
+  }
 
 	useEffect(() => {
 		async function getTemplateWithExercises(
@@ -128,8 +154,30 @@ export default function PublicPage({ user }: { user: User }) {
 			<h1 className='mt-5'>{template.name}</h1>
 			<Separator />
 			<ul>
-				{template.exercises.map((exercise) => (
-					<Select>
+				{template.exercises.map((exercise, index) => (
+					<Select
+						value={exercise.id}
+						onValueChange={(value) => {
+							const newExercises = template.exercises.map(
+                (exercise2, j) => {
+                  if (index === j && exercise.name !== value) {
+										exercise2.id = value
+										exercise.name =
+											allExercises.find((exercise3) => exercise3.id === value)
+												?.name || ''
+									}
+
+                  return exercise2
+                }
+              )
+
+              console.log(template)
+							setTemplate({
+                ...template,
+                exercises: newExercises
+              })
+						}}
+					>
 						<div className='flex'>
 							<SelectTrigger className='w-[180px] mt-5'>
 								<SelectValue placeholder={exercise.name} />
@@ -174,9 +222,9 @@ export default function PublicPage({ user }: { user: User }) {
 				<Button
 					className={cn(
 						'transition-colors duration-300',
-						false && 'bg-green-500 hover:bg-green-600',
+						isSuccess && 'bg-green-500 hover:bg-green-600',
 					)}
-					onClick={() => console.log('edit template')}
+					onClick={handleSave}
 				>
 					Save
 				</Button>
