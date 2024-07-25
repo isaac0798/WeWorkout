@@ -76,6 +76,7 @@ const SetInput = ({
 				<i className="bi bi-trash3"></i>
 			</Button>
 			<Checkbox
+				checked={checked}
 				onCheckedChange={(checked) => {
 					const newWorkout = updateSet(
 						workout,

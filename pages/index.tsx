@@ -198,7 +198,7 @@ const Index = ({ user }: { user: User }) => {
 						setWorkout={setWorkout}
 						workout={workout}
 					/>
-					{workout?.exercises?.map((exercise) => {
+					{workout?.exercises?.map((exercise, i) => {
 						return (
 							<>
 								<div className="mt-5" key={exercise.id}>
@@ -211,12 +211,19 @@ const Index = ({ user }: { user: User }) => {
 											}}
 											onSelect={(value) => {
 												const newExercises = workout.exercises.map(
-													(exercise) => {
-														if (exercise.name === "N/A") {
-															exercise.name = value;
+													(exercise2, j) => {
+														if (exercise2.name === 'N/A') {
+															exercise2.name = value
+
+															return exercise2
 														}
 
-														return exercise;
+														if (i === j && exercise.name !== value) {
+															exercise2.name = value
+															exercise.id = allExercises.find((exercise3) => exercise3.name === value)?.id || ''
+														}
+
+														return exercise2
 													},
 												);
 

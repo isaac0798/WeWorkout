@@ -1,6 +1,6 @@
 import { createFEClient } from "@/utils/supabase/component";
 
-export async function addExerciseToSupabase(exerciseName: string) {
+export async function addExerciseToSupabase(exerciseName: string): Promise<{data: any, error: any}> {
 	const supabase = createFEClient();
 
 	const { data, error } = await supabase
@@ -9,6 +9,5 @@ export async function addExerciseToSupabase(exerciseName: string) {
 		.select()
 		.single();
 
-	if (error) throw error;
-	return data;
+	return {data, error};
 }
