@@ -108,8 +108,10 @@ const Index = ({ user }: { user: User }) => {
 				throw error
 			}
 
+			let newdata: any = data;
+
 			// Restructure the data for easier use
-			const formattedWorkouts = data?.map((workout) => ({
+			const formattedWorkouts = newdata?.map((workout) => ({
 				id: workout.id,
 				name: workout.name,
 				date: workout.date,
@@ -205,7 +207,7 @@ const Index = ({ user }: { user: User }) => {
 					<SelectContent>
 						{uniqueExercises.map((exercise) => {
 							return (
-								<SelectItem value={exercise.id}>{exercise.name}</SelectItem>
+								<SelectItem key={exercise.id} value={exercise.id}>{exercise.name}</SelectItem>
 							)
 						})}
 					</SelectContent>
