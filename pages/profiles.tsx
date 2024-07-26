@@ -11,7 +11,18 @@ import { createClient } from '@/utils/supabase/server-props'
 import type { User } from '@supabase/supabase-js'
 import type { GetServerSidePropsContext } from 'next'
 import { useEffect, useState } from 'react'
-import { Area, AreaChart, Bar, BarChart, Line, LineChart, Scatter, ScatterChart, XAxis, YAxis } from 'recharts'
+import {
+	Area,
+	AreaChart,
+	Bar,
+	BarChart,
+	Line,
+	LineChart,
+	Scatter,
+	ScatterChart,
+	XAxis,
+	YAxis,
+} from 'recharts'
 
 import { ChartConfig, ChartContainer } from '@/components/ui/chart'
 import { Separator } from '@/components/ui/separator'
@@ -57,6 +68,7 @@ const Index = ({ user }: { user: User }) => {
 	const [selectedExercise, setSelectedExercise] = useState<Exercise>()
 	const [chartData, setChartData] =
 		useState<{ reps: number; weight: number }[]>()
+	const [highlights, setHighlights] = useState<string[]>([])
 
 	const chartConfig = {
 		weight: {
@@ -110,7 +122,7 @@ const Index = ({ user }: { user: User }) => {
 				throw error
 			}
 
-			let newdata: any = data;
+			let newdata: any = data
 
 			// Restructure the data for easier use
 			const formattedWorkouts = newdata?.map((workout) => ({
@@ -135,6 +147,33 @@ const Index = ({ user }: { user: User }) => {
 		} catch (error) {
 			console.error('Failed to fetch workouts:', error)
 		}
+
+		supabase.storage
+			.from('highlights')
+			.list(`${user.id}`, {
+				limit: 100,
+				offset: 0,
+				sortBy: { column: 'name', order: 'asc' },
+			})
+			.then(({ data, error }) => {
+				console.log(data)
+				data?.map((file) => {
+					supabase.storage
+						.from('highlights')
+						.download(`${user.id}/${file.name}`)
+						.then(({data, error}) => {
+							if (!data || error) {
+								return;
+							}
+
+							const blob = new Blob([data], { type: 'video/mp4' })	
+							setHighlights([...highlights, URL.createObjectURL(blob)])
+						})
+
+				})
+
+
+			})
 	}, [])
 
 	function getUniqueExercises(workouts: Workout[]): Exercise[] {
@@ -162,19 +201,20 @@ const Index = ({ user }: { user: User }) => {
 			return
 		}
 
-		const highestWeightForRep: {[key: string]: number} = selectedExercise.sets.reduce((acc, set) => {
-			if (set.reps in acc) {
-				if (set.weight > acc[set.reps]) {
-					acc[set.reps] = set.weight
+		const highestWeightForRep: { [key: string]: number } =
+			selectedExercise.sets.reduce((acc, set) => {
+				if (set.reps in acc) {
+					if (set.weight > acc[set.reps]) {
+						acc[set.reps] = set.weight
 
-					return acc
+						return acc
+					}
+				} else {
+					acc[set.reps] = set.weight || 0
 				}
-			} else {
-				acc[set.reps] = set.weight || 0
-			}
 
-			return acc
-		}, {})
+				return acc
+			}, {})
 
 		let formattedHighestWeightsForReps: { reps: number; weight: number }[] = []
 
@@ -250,7 +290,7 @@ const Index = ({ user }: { user: User }) => {
 					const file = e.target.files
 
 					if (!file || !file.length) {
-						return;
+						return
 					}
 
 					const { data, error } = await supabase.storage
@@ -262,6 +302,14 @@ const Index = ({ user }: { user: User }) => {
 					console.log('File uploaded successfully:', data.path)
 				}}
 			/>
+			{highlights.map((highlight) => {
+					return (
+						<video width='200' height='300' controls>
+							<source src={highlight} type='video/mp4' />
+							Your browser does not support the video tag.
+						</video>
+					)
+				})}
 		</Page>
 	)
 }
