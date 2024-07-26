@@ -109,7 +109,7 @@ export default function PublicPage({ user }: { user: User }) {
 				.eq("id", templateId)
 				.single();
 
-      let newData: any = data
+			const newData: any = data;
 
 			if (error) {
 				console.error("Error fetching template:", error);
@@ -128,7 +128,7 @@ export default function PublicPage({ user }: { user: User }) {
 						name: te.Exercise.name,
 						order: te.order_in_template,
 					})),
-				})
+				});
 			}
 
 			return null;
@@ -195,7 +195,7 @@ export default function PublicPage({ user }: { user: User }) {
 				{template.exercises.map((exercise, index) => (
 					<Select
 						value={exercise.id}
-            key={exercise.id}
+						key={exercise.id}
 						onValueChange={(value) => {
 							const newExercises = template.exercises.map((exercise2, j) => {
 								if (index === j && exercise.name !== value) {

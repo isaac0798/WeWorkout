@@ -39,53 +39,7 @@ export default function PublicPage({ user }: { user: User }) {
 		{ id: string; name: string }[]
 	>([]);
 
-	/* 	const [isSuccess, setIsSuccess] = useState(false);
-
-	const [templateName, setTemplateName] = useState("");
-	const [selectedExercises, setSelectedExercises] = useState<string[]>([]); */
-
 	const [templates, setTemplates] = useState<Template[]>([]);
-
-	/* 	const handleAddExercise = (exerciseId: string) => {
-		setSelectedExercises([...selectedExercises, exerciseId]);
-	};
-
-	const handleRemoveExercise = (id: string) => {
-		setSelectedExercises(
-			selectedExercises.filter((exercise) => exercise !== id),
-		);
-	};
-
-	const handleCreateTemplate = async () => {
-		// Here you would call your backend to create the template
-		console.log("Creating template:", {
-			name: templateName,
-			exercises: selectedExercises,
-		});
-
-		if (!templateName || !selectedExercises.length) {
-			return;
-		}
-
-		const newTemplate = {
-			userId: user.id,
-			templateId: uuidv4(),
-			name: templateName,
-			exercises: selectedExercises,
-		};
-
-		const { data, error } = await supabase.functions.invoke("upsert-template", {
-			body: JSON.stringify(newTemplate),
-		});
-
-		if (error) throw error;
-		setIsSuccess(true);
-		setTimeout(() => {
-			setIsSuccess(false);
-			setTemplateName("");
-			setSelectedExercises([]);
-		}, 2000);
-	}; */
 
 	useEffect(() => {
 		supabase
