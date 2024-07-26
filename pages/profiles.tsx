@@ -14,6 +14,8 @@ import { useEffect, useState } from 'react'
 import { Area, AreaChart, Bar, BarChart, Line, LineChart, Scatter, ScatterChart, XAxis, YAxis } from 'recharts'
 
 import { ChartConfig, ChartContainer } from '@/components/ui/chart'
+import { Separator } from '@/components/ui/separator'
+import { Input } from '@/components/ui/input'
 
 interface Workout {
 	id: string
@@ -193,7 +195,8 @@ const Index = ({ user }: { user: User }) => {
 			<h1>
 				{profile?.first_name} {profile?.last_name}
 			</h1>
-			<div>
+			<Separator />
+			<div className='mt-5'>
 				<Select
 					onValueChange={(value) =>
 						setSelectedExercise(
@@ -207,7 +210,9 @@ const Index = ({ user }: { user: User }) => {
 					<SelectContent>
 						{uniqueExercises.map((exercise) => {
 							return (
-								<SelectItem key={exercise.id} value={exercise.id}>{exercise.name}</SelectItem>
+								<SelectItem key={exercise.id} value={exercise.id}>
+									{exercise.name}
+								</SelectItem>
 							)
 						})}
 					</SelectContent>
@@ -220,7 +225,10 @@ const Index = ({ user }: { user: User }) => {
 					</div>
 				)}
 				{chartData && (
-					<ChartContainer config={chartConfig} className='min-h-[200px] w-full mt-5'>
+					<ChartContainer
+						config={chartConfig}
+						className='min-h-[200px] w-full mt-5'
+					>
 						<ScatterChart accessibilityLayer data={chartData}>
 							<XAxis
 								dataKey='weight'
@@ -228,14 +236,32 @@ const Index = ({ user }: { user: User }) => {
 								tickMargin={10}
 								axisLine={false}
 							/>
-							<YAxis 
-								dataKey='reps'
-							/>
+							<YAxis dataKey='reps' />
 							<Scatter dataKey='reps' fill='var(--color-weight)' radius={4} />
 						</ScatterChart>
 					</ChartContainer>
 				)}
 			</div>
+			<Separator />
+			<h1 className='mt-5'>Hightlights</h1>
+			<Input
+				type='file'
+				onChange={async (e) => {
+					const file = e.target.files
+
+					if (!file || !file.length) {
+						return;
+					}
+
+					const { data, error } = await supabase.storage
+						.from('highlights')
+						.upload(`${profile?.id}/${file[0].name}`, file[0])
+
+					if (error) throw error
+
+					console.log('File uploaded successfully:', data.path)
+				}}
+			/>
 		</Page>
 	)
 }
