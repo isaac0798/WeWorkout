@@ -182,7 +182,10 @@ const Index = ({ user }: { user: User }) => {
 			})
 		}
 
-		setChartData(formattedHighestWeightsForReps)
+		console.log('formatted:', formattedHighestWeightsForReps)
+		setChartData(
+			formattedHighestWeightsForReps.sort((a, b) => a.weight - b.weight),
+		)
 	}, [selectedExercise])
 
 	console.log('chart data:', chartData)
@@ -220,7 +223,7 @@ const Index = ({ user }: { user: User }) => {
 				)}
 				{chartData && (
 					<ChartContainer config={chartConfig} className='min-h-[200px] w-full mt-5'>
-						<BarChart accessibilityLayer data={chartData}>
+						<ScatterChart accessibilityLayer data={chartData}>
 							<XAxis
 								dataKey='weight'
 								tickLine={false}
@@ -230,8 +233,8 @@ const Index = ({ user }: { user: User }) => {
 							<YAxis 
 								dataKey='reps'
 							/>
-							<Bar dataKey='reps' fill='var(--color-weight)' radius={4} />
-						</BarChart>
+							<Scatter dataKey='reps' fill='var(--color-weight)' radius={4} />
+						</ScatterChart>
 					</ChartContainer>
 				)}
 			</div>
