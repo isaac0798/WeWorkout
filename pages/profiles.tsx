@@ -55,7 +55,6 @@ const Index = ({ user }: { user: User }) => {
 	const [selectedExercise, setSelectedExercise] = useState<Exercise>()
 	const [chartData, setChartData] =
 		useState<{ reps: number; weight: number }[]>()
-	console.log(selectedExercise)
 
 	const chartConfig = {
 		weight: {
@@ -182,13 +181,10 @@ const Index = ({ user }: { user: User }) => {
 			})
 		}
 
-		console.log('formatted:', formattedHighestWeightsForReps)
 		setChartData(
 			formattedHighestWeightsForReps.sort((a, b) => a.weight - b.weight),
 		)
 	}, [selectedExercise])
-
-	console.log('chart data:', chartData)
 
 	return (
 		<Page>
