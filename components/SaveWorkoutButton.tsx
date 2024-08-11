@@ -1,39 +1,10 @@
 import { cn } from "@/lib/utils"; // Assuming you're using shadcn's utility for class merging
 import { useState } from "react";
 import { Button } from "./ui/button";
+import handleSave from "@/lib/saveWorkout";
 
 const SaveButton = ({ workout, user, supabase }) => {
 	const [isSuccess, setIsSuccess] = useState(false);
-
-	const handleSave = async () => {
-		const unFilledExercise = workout.exercises?.some(
-			(exercise) => exercise.name === "N/A",
-		);
-		if (unFilledExercise) {
-			alert("Fill in all exercises pls");
-			return;
-		}
-
-		try {
-			const { data, error } = await supabase.functions.invoke(
-				"insert_workout",
-				{
-					body: JSON.stringify({
-						workoutData: workout,
-						userId: user.id,
-					}),
-				},
-			);
-
-			if (error) throw error;
-
-			console.log("Success:", data);
-			setIsSuccess(true);
-			setTimeout(() => setIsSuccess(false), 2000); // Reset after 2 seconds
-		} catch (error) {
-			console.error("Error:", error);
-		}
-	};
 
 	return (
 		<Button
@@ -41,7 +12,9 @@ const SaveButton = ({ workout, user, supabase }) => {
 				"ml-5 transition-colors duration-300",
 				isSuccess && "bg-green-500 hover:bg-green-600",
 			)}
-			onClick={handleSave}
+			onClick={() => {
+				handleSave(workout, setIsSuccess, user)
+			}}
 		>
 			{isSuccess ? "Saved!" : "Save"}
 		</Button>

@@ -1,4 +1,3 @@
-const MillionLint = require('@million/lint');
 /** @type {import('next').NextConfig} */
 
 const withPWA = require('next-pwa')({
@@ -6,6 +5,6 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true
 });
-module.exports = MillionLint.next()(withPWA({
+module.exports = withPWA({
   reactStrictMode: true
-}));
+})

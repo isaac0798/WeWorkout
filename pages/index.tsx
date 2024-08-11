@@ -61,7 +61,7 @@ const Index = ({ user }: { user: User }) => {
 	const [templates, setTemplates] = useState<Template[]>([]);
 
 	useEffect(() => {
-/* 		supabase
+		supabase
 			.from("Exercise")
 			.select("id, name")
 			.order("name")
@@ -71,7 +71,7 @@ const Index = ({ user }: { user: User }) => {
 					throw error;
 				}
 				setAllExercises(data);
-			}); */
+			});
 
 		async function getAllTemplatesForUser() {
 			const { data, error } = await supabase.rpc("get_templates_for_user", {
@@ -197,6 +197,7 @@ const Index = ({ user }: { user: User }) => {
 												setWorkout={setWorkout}
 												exercise={exercise}
 												removeSetFromExercise={removeSetFromExercise}
+												user={user}
 											/>
 										);
 									})}
