@@ -92,7 +92,7 @@ const SetInput = ({
 					setWorkout(newWorkout);
 					setIsChecked(checked as boolean);
 
-					handleSave(workout, (param) => console.log(param), user)
+					handleSave(newWorkout, (param) => console.log(param), user)
 				}}
 				className="mt-5 ml-5"
 				id="terms"

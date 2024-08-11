@@ -13,10 +13,10 @@ const SaveButton = ({ workout, user, supabase }) => {
 				isSuccess && "bg-green-500 hover:bg-green-600",
 			)}
 			onClick={() => {
-				handleSave(workout, setIsSuccess, user)
+				handleSave({...workout, completed: true}, setIsSuccess, user)
 			}}
 		>
-			{isSuccess ? "Saved!" : "Save"}
+			{isSuccess ? "Completed!" : "Complete"}
 		</Button>
 	);
 };

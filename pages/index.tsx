@@ -8,7 +8,7 @@ import type { User } from "@supabase/supabase-js";
 import type { GetServerSidePropsContext } from "next";
 import { useState, useRef, Suspense, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-
+import { useSearchParams } from 'next/navigation'
 import { DynamicSelect } from "@/components/DynamicSelect";
 import { EditableHeader } from "@/components/EditableHeader";
 import SaveButton from "@/components/SaveWorkoutButton";
@@ -51,8 +51,6 @@ const Index = ({ user }: { user: User }) => {
 	const renderCounter = useRef(0)
 	renderCounter.current = renderCounter.current + 1
 
-	console.log(`Render Counter ${renderCounter.current}`)
-	const [date, setDate] = useState<Date | undefined>(new Date());
 	const [workout, setWorkout] = useState<WorkoutData>(defaultWorkoutData);
 	const [allExercises, setAllExercises] = useState<
 		{ id: string; name: string }[]
@@ -119,14 +117,14 @@ const Index = ({ user }: { user: User }) => {
 
 	return (
 		<Page>
-			<Section>
+{/* 			<Section>
 				<Calendar
 					mode="single"
 					selected={date}
 					onSelect={setDate}
 					className="rounded-md border"
 				/>
-			</Section>
+			</Section> */}
 			<Suspense fallback={<h1>Loading....</h1>}>
 				<Section>
 					<EditableHeader
@@ -267,6 +265,7 @@ const Index = ({ user }: { user: User }) => {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
 	const supabase = createClient(context);
+	console.log('hello', context.params)
 
 	const { data, error } = await supabase.auth.getUser();
 
