@@ -2,15 +2,15 @@ import { Textarea } from "@/components/ui/textarea";
 import handleSave from "@/lib/saveWorkout";
 import React, { useState, useCallback, useEffect } from "react";
 
-const DebouncedTextarea = ({ initalValue, workout, user }) => {
+const DebouncedTextarea = ({ initalValue, workout, user, setWorkout }) => {
 	const [value, setValue] = useState(initalValue);
 
 	const handleDebouncedChange = (text) => {
 		console.log("User finished typing:", text);
 		handleSave({ ...workout, notes: text }, (p) => console.log("p", p), user);
+		setWorkout({ ...workout, notes: text })
 	};
 
-	// Debounce function
 	const debounce = (func, wait) => {
 		let timeout;
 		return (...args) => {
