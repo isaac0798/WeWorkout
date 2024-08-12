@@ -123,9 +123,9 @@ const Index = ({ user }: { user: User }) => {
 			});
 	}, [date]);
 
-	useEffect(() => {
+/* 	useEffect(() => {
 		handleSave(workout, (p) => console.log(p), user)	
-	}, [workout])
+	}, [workout]) */
 
 	const handleRemoveExercise = (exerciseId: string) => {
 		setWorkout((currentWorkout) => removeExercise(currentWorkout, exerciseId));
