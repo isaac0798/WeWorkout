@@ -31,6 +31,8 @@ const defaultWorkoutData: WorkoutData = {
 	name: "New Workout",
 	date: new Date().toISOString().split("T")[0], // Today's date in YYYY-MM-DD format
 	exercises: [],
+	completed: false,
+	notes: ''
 };
 
 export interface ExerciseSet {
