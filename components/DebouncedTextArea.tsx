@@ -7,8 +7,12 @@ const DebouncedTextarea = ({ initalValue, workout, user, setWorkout }) => {
 
 	const handleDebouncedChange = (text) => {
 		console.log("User finished typing:", text);
+
+		console.log('Workout', workout)
 		handleSave({ ...workout, notes: text }, (p) => console.log("p", p), user);
 		setWorkout({ ...workout, notes: text });
+
+		console.log('yooyoyo', { ...workout, notes: text })
 	};
 
 	const debounce = (func, wait) => {

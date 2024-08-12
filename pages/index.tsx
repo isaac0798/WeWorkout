@@ -178,6 +178,7 @@ const Index = ({ user }: { user: User }) => {
 						templates={templates}
 						setWorkout={setWorkout}
 						workout={workout}
+						user={user}
 					/>
 					{workout?.exercises?.map((exercise, i) => {
 						return (
