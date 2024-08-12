@@ -23,6 +23,8 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Template } from "./templates";
+import { Textarea } from "@/components/ui/textarea";
+import DebouncedTextarea from "@/components/DebouncedTextArea";
 
 const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),
@@ -49,11 +51,13 @@ export interface WorkoutData {
 	name: string;
 	date: string;
 	exercises: Exercise[];
+	completed: boolean;
+	notes: string;
 }
 
 const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient();
-	const [date, setDate] = useState<Date | undefined>(new Date());
+	const [date, setDate] = useState<Date>(new Date());
 	const renderCounter = useRef(0);
 	renderCounter.current = renderCounter.current + 1;
 
@@ -122,29 +126,46 @@ const Index = ({ user }: { user: User }) => {
 
 	return (
 		<Page>
-			<Popover>
-				<PopoverTrigger asChild>
-					<Button variant="outline">{date?.toLocaleDateString()}</Button>
-				</PopoverTrigger>
-				<PopoverContent className="w-80">
-					<Calendar
-						mode="single"
-						selected={date}
-						onSelect={(d) => setDate(d ?? new Date())}
-						className="rounded-md border"
-					/>
-				</PopoverContent>
-			</Popover>
+			<div className='flex justify-evenly align-baseline'>
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button variant='ghost' size='icon' className='ml-5'>
+							<i className='bi bi-journals'></i>
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent className='w-80'>
+						<DebouncedTextarea
+							initalValue={workout.notes}
+							workout={workout}
+							user={user}
+						/>
+					</PopoverContent>
+				</Popover>
+
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button variant='outline'>{date?.toLocaleDateString()}</Button>
+					</PopoverTrigger>
+					<PopoverContent className='w-80'>
+						<Calendar
+							mode='single'
+							selected={date}
+							onSelect={(d) => setDate(d ?? new Date())}
+							className='rounded-md border'
+						/>
+					</PopoverContent>
+				</Popover>
+			</div>
 
 			<Suspense fallback={<h1>Loading....</h1>}>
 				<Section>
 					<EditableHeader
-						initialText={workout?.name || "New Workout"}
+						initialText={workout?.name || 'New Workout'}
 						onSave={(newWorkoutName) => {
 							setWorkout({
 								...workout,
 								name: newWorkoutName,
-							});
+							})
 						}}
 						templates={templates}
 						setWorkout={setWorkout}
@@ -153,45 +174,45 @@ const Index = ({ user }: { user: User }) => {
 					{workout?.exercises?.map((exercise, i) => {
 						return (
 							<>
-								<div className="mt-5" key={exercise.id}>
-									<div className="flex">
+								<div className='mt-5' key={exercise.id}>
+									<div className='flex'>
 										<DynamicSelect
 											options={allExercises}
 											placeholder={exercise.name}
 											onAddOption={(newExercise) => {
-												setAllExercises([...allExercises, newExercise]);
+												setAllExercises([...allExercises, newExercise])
 											}}
 											onSelect={(value) => {
 												const newExercises = workout.exercises.map(
 													(exercise2, j) => {
-														if (exercise2.name === "N/A") {
-															exercise2.name = value;
+														if (exercise2.name === 'N/A') {
+															exercise2.name = value
 
-															return exercise2;
+															return exercise2
 														}
 
 														if (i === j && exercise.name !== value) {
-															exercise2.name = value;
+															exercise2.name = value
 															exercise.id =
 																allExercises.find(
 																	(exercise3) => exercise3.name === value,
-																)?.id || "";
+																)?.id || ''
 														}
 
-														return exercise2;
+														return exercise2
 													},
-												);
+												)
 
-												setWorkout({ ...workout, exercises: newExercises });
+												setWorkout({ ...workout, exercises: newExercises })
 											}}
 										/>
 										<Button
-											variant="ghost"
-											size="icon"
-											className="ml-5"
+											variant='ghost'
+											size='icon'
+											className='ml-5'
 											onClick={() => handleRemoveExercise(exercise.id)}
 										>
-											<i className="bi bi-trash3"></i>
+											<i className='bi bi-trash3'></i>
 										</Button>
 									</div>
 
@@ -208,46 +229,46 @@ const Index = ({ user }: { user: User }) => {
 												removeSetFromExercise={removeSetFromExercise}
 												user={user}
 											/>
-										);
+										)
 									})}
 
 									<Button
-										className="mt-5"
+										className='mt-5'
 										onClick={() => {
 											const newSet = {
 												id: uuidv4(),
 												weight: 0,
 												reps: 0,
 												isChecked: false,
-											};
+											}
 
-											addSetToExercise(exercise.id, newSet, setWorkout);
+											addSetToExercise(exercise.id, newSet, setWorkout)
 										}}
 									>
 										Add Set
 									</Button>
 								</div>
 							</>
-						);
+						)
 					})}
 				</Section>
 				<Section>
 					<Button
 						onClick={() => {
 							if (!workout) {
-								setWorkout(defaultWorkoutData);
+								setWorkout(defaultWorkoutData)
 
-								return;
+								return
 							}
 
 							const unFilledExercise = workout.exercises?.some(
-								(exercise) => exercise.name === "N/A",
-							);
+								(exercise) => exercise.name === 'N/A',
+							)
 
 							if (unFilledExercise) {
-								alert("Fill in all exercises pls before adding more");
+								alert('Fill in all exercises pls before adding more')
 
-								return;
+								return
 							}
 
 							setWorkout({
@@ -256,13 +277,13 @@ const Index = ({ user }: { user: User }) => {
 									...workout.exercises,
 									{
 										id: uuidv4(),
-										name: "N/A",
+										name: 'N/A',
 										sets: [
 											{ id: uuidv4(), weight: 0, reps: 0, isChecked: false },
 										],
 									},
 								],
-							});
+							})
 						}}
 					>
 						Add Exercise
@@ -271,7 +292,7 @@ const Index = ({ user }: { user: User }) => {
 				</Section>
 			</Suspense>
 		</Page>
-	);
+	)
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
