@@ -1,16 +1,8 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover'
-import { Button } from "./ui/button";
-import { Calendar } from "./ui/calendar";
 
 const Appbar = () => {
 	const router = useRouter();
-	const date = new Date()
 
 	return (
 		<div className='fixed top-0 left-0 z-20 w-full bg-zinc-900 pt-safe'>
@@ -20,32 +12,13 @@ const Appbar = () => {
 						<h1 className='font-medium'>WeWorkout</h1>
 					</Link>
 
-					<Popover>
-						<PopoverTrigger asChild>
-							<Button variant='outline'>{date.toLocaleDateString()}</Button>
-						</PopoverTrigger>
-						<PopoverContent className='w-80'>
-							<Calendar
-								mode='single'
-								selected={date}
-								onSelect={(d) => console.log(d?.toLocaleDateString())}
-								className='rounded-md border'
-							/>
-						</PopoverContent>
-					</Popover>
-
 					<nav className='flex items-center space-x-6'>
 						<div className='hidden sm:block'>
 							<div className='flex items-center space-x-6'>
 								{links.map(({ label, href }) => (
 									<Link
 										key={label}
-										href={{
-											pathname: href,
-											query: {
-												date: date.toDateString()
-											}
-										}}
+										href={href}
 										className={`text-sm ${
 											router.pathname === href
 												? 'text-indigo-500 dark:text-indigo-400'
