@@ -1,26 +1,27 @@
-import Page from "@/components/page";
-import Section from "@/components/section";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { createFEClient } from "@/utils/supabase/component";
-import { createClient } from "@/utils/supabase/server-props";
-import type { User } from "@supabase/supabase-js";
-import type { GetServerSidePropsContext } from "next";
-import { useState } from "react";
-import { Suspense } from "react";
-
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
-
 import { DynamicSelect } from "@/components/DynamicSelect";
 import { EditableHeader } from "@/components/EditableHeader";
 import SaveButton from "@/components/SaveWorkoutButton";
 import SetInput from "@/components/SetInput";
-import { Checkbox } from "@/components/ui/checkbox";
-import getAllExercisesForUser from "@/lib/getAllExerciseForUsers";
+import Page from "@/components/page";
+import Section from "@/components/section";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import addSetToExercise from "@/lib/addSetToExercise";
 import removeExercise from "@/lib/removeExercise";
+import removeSetFromExercise from "@/lib/removeSetFromExercise";
+import updateSet from "@/lib/updateSet";
+import { createFEClient } from "@/utils/supabase/component";
+import { createClient } from "@/utils/supabase/server-props";
+import type { User } from "@supabase/supabase-js";
+import type { GetServerSidePropsContext } from "next";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import type { Template } from "./templates";
 
 const defaultWorkoutData: WorkoutData = {
@@ -53,65 +54,15 @@ export interface WorkoutData {
 const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient();
 	const [date, setDate] = useState<Date | undefined>(new Date());
+	const renderCounter = useRef(0);
+	renderCounter.current = renderCounter.current + 1;
+
 	const [workout, setWorkout] = useState<WorkoutData>(defaultWorkoutData);
 	const [allExercises, setAllExercises] = useState<
 		{ id: string; name: string }[]
 	>([]);
 
 	const [templates, setTemplates] = useState<Template[]>([]);
-
-	function updateSet(
-		workoutData: WorkoutData,
-		exerciseId: string,
-		setIndex: number,
-		field: "weight" | "reps",
-		value: string,
-	): WorkoutData {
-		return {
-			...workoutData,
-			exercises: workoutData.exercises.map((exercise) =>
-				exercise.id === exerciseId
-					? {
-							...exercise,
-							sets: exercise.sets.map((set, index) =>
-								index === setIndex ? { ...set, [field]: value } : set,
-							),
-						}
-					: exercise,
-			),
-		};
-	}
-
-	const addSetToExercise = (exerciseId: string, newSet: ExerciseSet) => {
-		setWorkout((prevState) => {
-			const updatedExercises = prevState?.exercises.map((exercise) => {
-				if (exercise.id === exerciseId) {
-					const updatedSets = [...exercise.sets, newSet];
-					return { ...exercise, sets: updatedSets };
-				}
-				return exercise;
-			});
-			return { ...prevState, exercises: updatedExercises };
-		});
-	};
-
-	const removeSetFromExercise = (exerciseId: string, setIndex: number) => {
-		setWorkout((prevState) => {
-			if (!prevState) return prevState; // Handle case where prevState is null or undefined
-
-			const updatedExercises = prevState.exercises.map((exercise) => {
-				if (exercise.id === exerciseId) {
-					const updatedSets = exercise.sets.filter(
-						(_, index) => index !== setIndex,
-					);
-					return { ...exercise, sets: updatedSets };
-				}
-				return exercise;
-			});
-
-			return { ...prevState, exercises: updatedExercises };
-		});
-	};
 
 	useEffect(() => {
 		supabase
@@ -144,30 +95,25 @@ const Index = ({ user }: { user: User }) => {
 	}, []);
 
 	useEffect(() => {
-		async function getWorkoutForDate() {
-			const { data, error } = await supabase.rpc(
-				"get_workout_for_user_on_date",
-				{
-					p_user_id: user.id,
-					p_date: date?.toDateString(),
-				},
-			);
+		supabase
+			.rpc("get_workout_for_user_on_date", {
+				p_user_id: user.id,
+				p_date: date?.toDateString(),
+			})
+			.then(({ data, error }) => {
+				if (error) {
+					console.error("Error fetching workout:", error);
+					return defaultWorkoutData;
+				}
 
-			if (error) {
-				console.error("Error fetching workout:", error);
-				return defaultWorkoutData;
-			}
+				if (!data.workout) {
+					setWorkout(defaultWorkoutData);
 
-			if (!data.workout) {
-				setWorkout(defaultWorkoutData);
+					return;
+				}
 
-				return;
-			}
-
-			setWorkout(data.workout);
-		}
-
-		getWorkoutForDate();
+				setWorkout(data.workout);
+			});
 	}, [date]);
 
 	const handleRemoveExercise = (exerciseId: string) => {
@@ -176,14 +122,20 @@ const Index = ({ user }: { user: User }) => {
 
 	return (
 		<Page>
-			<Section>
-				<Calendar
-					mode="single"
-					selected={date}
-					onSelect={setDate}
-					className="rounded-md border"
-				/>
-			</Section>
+			<Popover>
+				<PopoverTrigger asChild>
+					<Button variant="outline">{date?.toLocaleDateString()}</Button>
+				</PopoverTrigger>
+				<PopoverContent className="w-80">
+					<Calendar
+						mode="single"
+						selected={date}
+						onSelect={(d) => setDate(d ?? new Date())}
+						className="rounded-md border"
+					/>
+				</PopoverContent>
+			</Popover>
+
 			<Suspense fallback={<h1>Loading....</h1>}>
 				<Section>
 					<EditableHeader
@@ -254,6 +206,7 @@ const Index = ({ user }: { user: User }) => {
 												setWorkout={setWorkout}
 												exercise={exercise}
 												removeSetFromExercise={removeSetFromExercise}
+												user={user}
 											/>
 										);
 									})}
@@ -268,7 +221,7 @@ const Index = ({ user }: { user: User }) => {
 												isChecked: false,
 											};
 
-											addSetToExercise(exercise.id, newSet);
+											addSetToExercise(exercise.id, newSet, setWorkout);
 										}}
 									>
 										Add Set

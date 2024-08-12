@@ -1,85 +1,96 @@
-import Page from '@/components/page'
+import Page from "@/components/page";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@/components/ui/select'
-import { createFEClient } from '@/utils/supabase/component'
-import { createClient } from '@/utils/supabase/server-props'
-import type { User } from '@supabase/supabase-js'
-import type { GetServerSidePropsContext } from 'next'
-import { useEffect, useState } from 'react'
-import { Area, AreaChart, Bar, BarChart, Line, LineChart, Scatter, ScatterChart, XAxis, YAxis } from 'recharts'
+} from "@/components/ui/select";
+import { createFEClient } from "@/utils/supabase/component";
+import { createClient } from "@/utils/supabase/server-props";
+import type { User } from "@supabase/supabase-js";
+import type { GetServerSidePropsContext } from "next";
+import { useEffect, useState } from "react";
+import {
+	Area,
+	AreaChart,
+	Bar,
+	BarChart,
+	Line,
+	LineChart,
+	Scatter,
+	ScatterChart,
+	XAxis,
+	YAxis,
+} from "recharts";
 
-import { ChartConfig, ChartContainer } from '@/components/ui/chart'
+import { type ChartConfig, ChartContainer } from "@/components/ui/chart";
 
 interface Workout {
-	id: string
-	name: string
-	date: string
+	id: string;
+	name: string;
+	date: string;
 	exercises: Array<{
-		id: string
-		name: string
+		id: string;
+		name: string;
 		sets: Array<{
-			id: string
-			weight: number
-			reps: number
-			completed: boolean
-		}>
-	}>
+			id: string;
+			weight: number;
+			reps: number;
+			completed: boolean;
+		}>;
+	}>;
 }
 
 interface Exercise {
-	id: string
-	name: string
+	id: string;
+	name: string;
 	sets: {
-		id: string
-		weight: number
-		reps: number
-		completed: boolean
-	}[]
+		id: string;
+		weight: number;
+		reps: number;
+		completed: boolean;
+	}[];
 }
 
 const Index = ({ user }: { user: User }) => {
-	const supabase = createFEClient()
+	const supabase = createFEClient();
 	const [profile, setProfile] = useState<{
-		id: string
-		first_name: string
-		last_name: string
-	}>()
+		id: string;
+		first_name: string;
+		last_name: string;
+	}>();
 
-	const [workouts, setWorkouts] = useState<Workout[]>([])
-	const [uniqueExercises, setUniqueExericses] = useState<Exercise[]>([])
-	const [selectedExercise, setSelectedExercise] = useState<Exercise>()
+	const [workouts, setWorkouts] = useState<Workout[]>([]);
+	const [uniqueExercises, setUniqueExericses] = useState<Exercise[]>([]);
+	const [selectedExercise, setSelectedExercise] = useState<Exercise>();
 	const [chartData, setChartData] =
-		useState<{ reps: number; weight: number }[]>()
+		useState<{ reps: number; weight: number }[]>();
 
 	const chartConfig = {
 		weight: {
-			label: 'Weight',
-			color: '#2563eb',
+			label: "Weight",
+			color: "#2563eb",
 		},
-	} satisfies ChartConfig
+	} satisfies ChartConfig;
 
 	useEffect(() => {
 		supabase
-			.from('profiles')
+			.from("profiles")
 			.select()
-			.eq('id', user.id)
+			.eq("id", user.id)
 			.single()
 			.then(({ data, error }) => {
 				if (error) {
-					console.error('error fetching profile:', error)
+					console.error("error fetching profile:", error);
 				}
 
-				setProfile(data)
-			})
+				setProfile(data);
+			});
 
 		const fetchUserWorkouts = async (userId: string) => {
 			const { data, error } = await supabase
-				.from('Workout')
+				.from("Workout")
 				.select(
 					`
       id,
@@ -100,15 +111,15 @@ const Index = ({ user }: { user: User }) => {
       )
     `,
 				)
-				.eq('user_id', userId)
-				.order('date', { ascending: false })
+				.eq("user_id", userId)
+				.order("date", { ascending: false });
 
 			if (error) {
-				console.error('Error fetching workouts:', error)
-				throw error
+				console.error("Error fetching workouts:", error);
+				throw error;
 			}
 
-			let newdata: any = data;
+			const newdata: any = data;
 
 			// Restructure the data for easier use
 			const formattedWorkouts = newdata?.map((workout) => ({
@@ -120,73 +131,75 @@ const Index = ({ user }: { user: User }) => {
 					name: we.Exercise.name,
 					sets: we.Sets,
 				})),
-			}))
+			}));
 
-			return formattedWorkouts
-		}
+			return formattedWorkouts;
+		};
 
 		try {
 			fetchUserWorkouts(user.id).then((workouts) => {
-				setWorkouts(workouts)
-				setUniqueExericses(getUniqueExercises(workouts))
-			})
+				setWorkouts(workouts);
+				setUniqueExericses(getUniqueExercises(workouts));
+			});
 		} catch (error) {
-			console.error('Failed to fetch workouts:', error)
+			console.error("Failed to fetch workouts:", error);
 		}
-	}, [])
+	}, []);
 
 	function getUniqueExercises(workouts: Workout[]): Exercise[] {
-		const exerciseSet = new Set<string>()
-		const uniqueExercises: Exercise[] = []
+		const exerciseSet = new Set<string>();
+		const uniqueExercises: Exercise[] = [];
 
 		workouts.forEach((workout) => {
 			workout.exercises.forEach((exercise) => {
 				if (!exerciseSet.has(exercise.id)) {
-					exerciseSet.add(exercise.id)
+					exerciseSet.add(exercise.id);
 					uniqueExercises.push({
 						id: exercise.id,
 						name: exercise.name,
 						sets: exercise.sets,
-					})
+					});
 				}
-			})
-		})
+			});
+		});
 
-		return uniqueExercises
+		return uniqueExercises;
 	}
 
 	useEffect(() => {
 		if (!selectedExercise) {
-			return
+			return;
 		}
 
-		const highestWeightForRep: {[key: string]: number} = selectedExercise.sets.reduce((acc, set) => {
-			if (set.reps in acc) {
-				if (set.weight > acc[set.reps]) {
-					acc[set.reps] = set.weight
+		const highestWeightForRep: { [key: string]: number } =
+			selectedExercise.sets.reduce((acc, set) => {
+				if (set.reps in acc) {
+					if (set.weight > acc[set.reps]) {
+						acc[set.reps] = set.weight;
 
-					return acc
+						return acc;
+					}
+				} else {
+					acc[set.reps] = set.weight || 0;
 				}
-			} else {
-				acc[set.reps] = set.weight || 0
-			}
 
-			return acc
-		}, {})
+				return acc;
+			}, {});
 
-		let formattedHighestWeightsForReps: { reps: number; weight: number }[] = []
+		const formattedHighestWeightsForReps: { reps: number; weight: number }[] =
+			[];
 
 		for (const [key, value] of Object.entries(highestWeightForRep)) {
 			formattedHighestWeightsForReps.push({
 				reps: Number(key),
 				weight: value,
-			})
+			});
 		}
 
 		setChartData(
 			formattedHighestWeightsForReps.sort((a, b) => a.weight - b.weight),
-		)
-	}, [selectedExercise])
+		);
+	}, [selectedExercise]);
 
 	return (
 		<Page>
@@ -202,13 +215,15 @@ const Index = ({ user }: { user: User }) => {
 					}
 				>
 					<SelectTrigger>
-						<SelectValue placeholder='Pick an Exercise' />
+						<SelectValue placeholder="Pick an Exercise" />
 					</SelectTrigger>
 					<SelectContent>
 						{uniqueExercises.map((exercise) => {
 							return (
-								<SelectItem key={exercise.id} value={exercise.id}>{exercise.name}</SelectItem>
-							)
+								<SelectItem key={exercise.id} value={exercise.id}>
+									{exercise.name}
+								</SelectItem>
+							);
 						})}
 					</SelectContent>
 				</Select>
@@ -220,45 +235,46 @@ const Index = ({ user }: { user: User }) => {
 					</div>
 				)}
 				{chartData && (
-					<ChartContainer config={chartConfig} className='min-h-[200px] w-full mt-5'>
+					<ChartContainer
+						config={chartConfig}
+						className="min-h-[200px] w-full mt-5"
+					>
 						<ScatterChart accessibilityLayer data={chartData}>
 							<XAxis
-								dataKey='weight'
+								dataKey="weight"
 								tickLine={false}
 								tickMargin={10}
 								axisLine={false}
 							/>
-							<YAxis 
-								dataKey='reps'
-							/>
-							<Scatter dataKey='reps' fill='var(--color-weight)' radius={4} />
+							<YAxis dataKey="reps" />
+							<Scatter dataKey="reps" fill="var(--color-weight)" radius={4} />
 						</ScatterChart>
 					</ChartContainer>
 				)}
 			</div>
 		</Page>
-	)
-}
+	);
+};
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-	const supabase = createClient(context)
+	const supabase = createClient(context);
 
-	const { data, error } = await supabase.auth.getUser()
+	const { data, error } = await supabase.auth.getUser();
 
 	if (error || !data) {
 		return {
 			redirect: {
-				destination: '/login',
+				destination: "/login",
 				permanent: false,
 			},
-		}
+		};
 	}
 
 	return {
 		props: {
 			user: data.user,
 		},
-	}
+	};
 }
 
-export default Index
+export default Index;
