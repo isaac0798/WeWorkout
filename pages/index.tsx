@@ -124,7 +124,7 @@ const Index = ({ user }: { user: User }) => {
 		<Page>
 			<Popover>
 				<PopoverTrigger asChild>
-					<Button variant="outline">{date.toLocaleDateString()}</Button>
+					<Button variant="outline">{date?.toLocaleDateString()}</Button>
 				</PopoverTrigger>
 				<PopoverContent className="w-80">
 					<Calendar
