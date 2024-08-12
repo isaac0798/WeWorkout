@@ -1,3 +1,4 @@
+import DebouncedTextarea from "@/components/DebouncedTextArea";
 import { DynamicSelect } from "@/components/DynamicSelect";
 import { EditableHeader } from "@/components/EditableHeader";
 import SaveButton from "@/components/SaveWorkoutButton";
@@ -11,6 +12,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import addSetToExercise from "@/lib/addSetToExercise";
 import removeExercise from "@/lib/removeExercise";
 import removeSetFromExercise from "@/lib/removeSetFromExercise";
@@ -29,6 +31,8 @@ const defaultWorkoutData: WorkoutData = {
 	name: "New Workout",
 	date: new Date().toISOString().split("T")[0], // Today's date in YYYY-MM-DD format
 	exercises: [],
+	completed: false,
+	notes: ''
 };
 
 export interface ExerciseSet {
@@ -49,11 +53,13 @@ export interface WorkoutData {
 	name: string;
 	date: string;
 	exercises: Exercise[];
+	completed: boolean;
+	notes: string;
 }
 
 const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient();
-	const [date, setDate] = useState<Date | undefined>(new Date());
+	const [date, setDate] = useState<Date>(new Date());
 	const renderCounter = useRef(0);
 	renderCounter.current = renderCounter.current + 1;
 
@@ -122,19 +128,36 @@ const Index = ({ user }: { user: User }) => {
 
 	return (
 		<Page>
-			<Popover>
-				<PopoverTrigger asChild>
-					<Button variant="outline">{date?.toLocaleDateString()}</Button>
-				</PopoverTrigger>
-				<PopoverContent className="w-80">
-					<Calendar
-						mode="single"
-						selected={date}
-						onSelect={(d) => setDate(d ?? new Date())}
-						className="rounded-md border"
-					/>
-				</PopoverContent>
-			</Popover>
+			<div className="flex justify-evenly align-baseline">
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button variant="ghost" size="icon" className="ml-5">
+							<i className="bi bi-journals"></i>
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent className="w-80">
+						<DebouncedTextarea
+							initalValue={workout.notes}
+							workout={workout}
+							user={user}
+						/>
+					</PopoverContent>
+				</Popover>
+
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button variant="outline">{date?.toLocaleDateString()}</Button>
+					</PopoverTrigger>
+					<PopoverContent className="w-80">
+						<Calendar
+							mode="single"
+							selected={date}
+							onSelect={(d) => setDate(d ?? new Date())}
+							className="rounded-md border"
+						/>
+					</PopoverContent>
+				</Popover>
+			</div>
 
 			<Suspense fallback={<h1>Loading....</h1>}>
 				<Section>
