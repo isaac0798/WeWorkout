@@ -1,12 +1,12 @@
+import handleSave from "@/lib/saveWorkout";
 import { cn } from "@/lib/utils";
 import type { Exercise, ExerciseSet, WorkoutData } from "@/pages";
+import type { User } from "@supabase/supabase-js";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import handleSave from "@/lib/saveWorkout";
-import { User } from "@supabase/supabase-js";
 
 const SetInput = ({
 	set,
@@ -16,7 +16,7 @@ const SetInput = ({
 	exercise,
 	setWorkout,
 	removeSetFromExercise,
-	user
+	user,
 }: {
 	set: ExerciseSet;
 	i: number;
@@ -25,7 +25,7 @@ const SetInput = ({
 	exercise: Exercise;
 	setWorkout: any;
 	removeSetFromExercise: any;
-	user: User
+	user: User;
 }) => {
 	const [checked, setIsChecked] = useState(set.isChecked);
 
@@ -92,7 +92,7 @@ const SetInput = ({
 					setWorkout(newWorkout);
 					setIsChecked(checked as boolean);
 
-					handleSave(newWorkout, (param) => console.log(param), user)
+					handleSave(newWorkout, (param) => console.log(param), user);
 				}}
 				className="mt-5 ml-5"
 				id="terms"

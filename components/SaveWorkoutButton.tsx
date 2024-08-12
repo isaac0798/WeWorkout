@@ -1,7 +1,7 @@
+import handleSave from "@/lib/saveWorkout";
 import { cn } from "@/lib/utils"; // Assuming you're using shadcn's utility for class merging
 import { useState } from "react";
 import { Button } from "./ui/button";
-import handleSave from "@/lib/saveWorkout";
 
 const SaveButton = ({ workout, user, supabase }) => {
 	const [isSuccess, setIsSuccess] = useState(false);
@@ -13,7 +13,7 @@ const SaveButton = ({ workout, user, supabase }) => {
 				isSuccess && "bg-green-500 hover:bg-green-600",
 			)}
 			onClick={() => {
-				handleSave({...workout, completed: true}, setIsSuccess, user)
+				handleSave({ ...workout, completed: true }, setIsSuccess, user);
 			}}
 		>
 			{isSuccess ? "Completed!" : "Complete"}
