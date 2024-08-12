@@ -10,11 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import type { WorkoutData } from "@/pages";
 import type { Template } from "@/pages/templates";
-import { createFEClient } from "@/utils/supabase/component";
-import { User } from "@supabase/supabase-js";
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 interface EditableHeaderProps {

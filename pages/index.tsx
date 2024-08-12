@@ -25,6 +25,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Template } from "./templates";
+import handleSave from "@/lib/saveWorkout";
 
 const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),
@@ -121,6 +122,10 @@ const Index = ({ user }: { user: User }) => {
 				setWorkout(data.workout);
 			});
 	}, [date]);
+
+	useEffect(() => {
+		handleSave(workout, (p) => console.log(p), user)	
+	}, [workout])
 
 	const handleRemoveExercise = (exerciseId: string) => {
 		setWorkout((currentWorkout) => removeExercise(currentWorkout, exerciseId));
