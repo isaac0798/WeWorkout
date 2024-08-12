@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import addSetToExercise from "@/lib/addSetToExercise";
 import removeExercise from "@/lib/removeExercise";
 import removeSetFromExercise from "@/lib/removeSetFromExercise";
+import handleSave from "@/lib/saveWorkout";
 import updateSet from "@/lib/updateSet";
 import { createFEClient } from "@/utils/supabase/component";
 import { createClient } from "@/utils/supabase/server-props";
@@ -25,7 +26,6 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Template } from "./templates";
-import handleSave from "@/lib/saveWorkout";
 
 const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),
@@ -33,7 +33,7 @@ const defaultWorkoutData: WorkoutData = {
 	date: new Date().toISOString().split("T")[0], // Today's date in YYYY-MM-DD format
 	exercises: [],
 	completed: false,
-	notes: ''
+	notes: "",
 };
 
 export interface ExerciseSet {
@@ -124,8 +124,8 @@ const Index = ({ user }: { user: User }) => {
 	}, [date]);
 
 	useEffect(() => {
-		handleSave(workout, (p) => console.log(p), user)	
-	}, [workout])
+		handleSave(workout, (p) => console.log(p), user);
+	}, [workout]);
 
 	const handleRemoveExercise = (exerciseId: string) => {
 		setWorkout((currentWorkout) => removeExercise(currentWorkout, exerciseId));

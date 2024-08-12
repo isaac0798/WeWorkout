@@ -8,7 +8,7 @@ const DebouncedTextarea = ({ initalValue, workout, user, setWorkout }) => {
 	const handleDebouncedChange = (text) => {
 		console.log("User finished typing:", text);
 		handleSave({ ...workout, notes: text }, (p) => console.log("p", p), user);
-		setWorkout({ ...workout, notes: text })
+		setWorkout({ ...workout, notes: text });
 	};
 
 	const debounce = (func, wait) => {
@@ -32,8 +32,8 @@ const DebouncedTextarea = ({ initalValue, workout, user, setWorkout }) => {
 		<Textarea
 			value={value}
 			onChange={(e) => setValue(e.target.value)}
-			placeholder="Lets add a note!"
 			rows={10}
+			placeholder="..."
 		/>
 	);
 };
