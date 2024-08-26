@@ -16,6 +16,7 @@ const removeSetFromExercise = (
 			return exercise;
 		});
 
+		console.log(updatedExercises);
 		return { ...prevState, exercises: updatedExercises };
 	});
 };
