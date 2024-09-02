@@ -26,6 +26,13 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Template } from "./templates";
+import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+	CarouselNext,
+	CarouselPrevious,
+} from '@/components/ui/carousel'
 
 const defaultWorkoutData: WorkoutData = {
 	id: uuidv4(),
@@ -133,14 +140,14 @@ const Index = ({ user }: { user: User }) => {
 
 	return (
 		<Page>
-			<div className="flex justify-evenly align-baseline">
+			<div className='flex justify-evenly align-baseline'>
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button variant="ghost" size="icon" className="ml-5">
-							<i className="bi bi-journals"></i>
+						<Button variant='ghost' size='icon' className='ml-5'>
+							<i className='bi bi-journals'></i>
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent className="w-80">
+					<PopoverContent className='w-80'>
 						<DebouncedTextarea
 							initalValue={workout.notes}
 							workout={workout}
@@ -152,14 +159,14 @@ const Index = ({ user }: { user: User }) => {
 
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button variant="outline">{date?.toLocaleDateString()}</Button>
+						<Button variant='outline'>{date?.toLocaleDateString()}</Button>
 					</PopoverTrigger>
-					<PopoverContent className="w-80">
+					<PopoverContent className='w-80'>
 						<Calendar
-							mode="single"
+							mode='single'
 							selected={date}
 							onSelect={(d) => setDate(d ?? new Date())}
-							className="rounded-md border"
+							className='rounded-md border'
 						/>
 					</PopoverContent>
 				</Popover>
@@ -168,116 +175,122 @@ const Index = ({ user }: { user: User }) => {
 			<Suspense fallback={<h1>Loading....</h1>}>
 				<Section>
 					<EditableHeader
-						initialText={workout?.name || "New Workout"}
+						initialText={workout?.name || 'New Workout'}
 						onSave={(newWorkoutName) => {
 							setWorkout({
 								...workout,
 								name: newWorkoutName,
-							});
+							})
 						}}
 						templates={templates}
 						setWorkout={setWorkout}
 						workout={workout}
 						user={user}
 					/>
-					{workout?.exercises?.map((exercise, i) => {
-						return (
-							<>
-								<div className="mt-5" key={exercise.id}>
-									<div className="flex">
-										<DynamicSelect
-											options={allExercises}
-											placeholder={exercise.name}
-											onAddOption={(newExercise) => {
-												setAllExercises([...allExercises, newExercise]);
-											}}
-											onSelect={(value) => {
-												const newExercises = workout.exercises.map(
-													(exercise2, j) => {
-														if (exercise2.name === "N/A") {
-															exercise2.name = value;
+					<Carousel>
+						<CarouselContent>
+							{workout?.exercises?.map((exercise, i) => {
+								return (
+									<CarouselItem key={exercise.id}>
+										<div className='mt-5' key={exercise.id}>
+											<div className='flex'>
+												<DynamicSelect
+													options={allExercises}
+													placeholder={exercise.name}
+													onAddOption={(newExercise) => {
+														setAllExercises([...allExercises, newExercise])
+													}}
+													onSelect={(value) => {
+														const newExercises = workout.exercises.map(
+															(exercise2, j) => {
+																if (exercise2.name === 'N/A') {
+																	exercise2.name = value
 
-															return exercise2;
-														}
+																	return exercise2
+																}
 
-														if (i === j && exercise.name !== value) {
-															exercise2.name = value;
-															exercise.id =
-																allExercises.find(
-																	(exercise3) => exercise3.name === value,
-																)?.id || "";
-														}
+																if (i === j && exercise.name !== value) {
+																	exercise2.name = value
+																	exercise.id =
+																		allExercises.find(
+																			(exercise3) => exercise3.name === value,
+																		)?.id || ''
+																}
 
-														return exercise2;
-													},
-												);
+																return exercise2
+															},
+														)
 
-												setWorkout({ ...workout, exercises: newExercises });
-											}}
-										/>
-										<Button
-											variant="ghost"
-											size="icon"
-											className="ml-5"
-											onClick={() => handleRemoveExercise(exercise.id)}
-										>
-											<i className="bi bi-trash3"></i>
-										</Button>
-									</div>
+														setWorkout({ ...workout, exercises: newExercises })
+													}}
+												/>
+												<Button
+													variant='ghost'
+													size='icon'
+													className='ml-5'
+													onClick={() => handleRemoveExercise(exercise.id)}
+												>
+													<i className='bi bi-trash3'></i>
+												</Button>
+											</div>
 
-									{exercise.sets.map((set, i) => {
-										return (
-											<SetInput
-												key={set.id}
-												set={set}
-												i={i}
-												updateSet={updateSet}
-												workout={workout}
-												setWorkout={setWorkout}
-												exercise={exercise}
-												removeSetFromExercise={removeSetFromExercise}
-												user={user}
-											/>
-										);
-									})}
+											{exercise.sets.map((set, i) => {
+												return (
+													<SetInput
+														key={set.id}
+														set={set}
+														i={i}
+														updateSet={updateSet}
+														workout={workout}
+														setWorkout={setWorkout}
+														exercise={exercise}
+														removeSetFromExercise={removeSetFromExercise}
+														user={user}
+													/>
+												)
+											})}
 
-									<Button
-										className="mt-5"
-										onClick={() => {
-											const newSet = {
-												id: uuidv4(),
-												weight: 0,
-												reps: 0,
-												isChecked: false,
-											};
+											<Button
+												className='mt-5'
+												onClick={() => {
+													const newSet = {
+														id: uuidv4(),
+														weight: 0,
+														reps: 0,
+														isChecked: false,
+													}
 
-											addSetToExercise(exercise.id, newSet, setWorkout);
-										}}
-									>
-										Add Set
-									</Button>
-								</div>
-							</>
-						);
-					})}
+													addSetToExercise(exercise.id, newSet, setWorkout)
+												}}
+											>
+												Add Set
+											</Button>
+										</div>
+									</CarouselItem>
+								)
+							})}
+						</CarouselContent>
+						<CarouselPrevious />
+						<CarouselNext />
+					</Carousel>
 				</Section>
 				<Section>
 					<Button
 						onClick={() => {
 							if (!workout) {
-								setWorkout(defaultWorkoutData);
+								setWorkout(defaultWorkoutData)
 
-								return;
+								return
 							}
 
 							const unFilledExercise = workout.exercises?.some(
-								(exercise) => exercise.name === "N/A",
-							);
+								(exercise) => exercise.name === 'N/A',
+							)
 
 							if (unFilledExercise) {
-								alert("Fill in all exercises pls before adding more");
+								alert('Fill in all exercises pls before adding more')
 
-								return;
+								return
 							}
 
 							setWorkout({
@@ -286,13 +299,13 @@ const Index = ({ user }: { user: User }) => {
 									...workout.exercises,
 									{
 										id: uuidv4(),
-										name: "N/A",
+										name: 'N/A',
 										sets: [
 											{ id: uuidv4(), weight: 0, reps: 0, isChecked: false },
 										],
 									},
 								],
-							});
+							})
 						}}
 					>
 						Add Exercise
@@ -301,7 +314,7 @@ const Index = ({ user }: { user: User }) => {
 				</Section>
 			</Suspense>
 		</Page>
-	);
+	)
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
