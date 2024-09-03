@@ -12,12 +12,8 @@ import type { User } from "@supabase/supabase-js";
 import type { GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 import {
-	Area,
-	AreaChart,
-	Bar,
-	BarChart,
-	Line,
-	LineChart,
+	CartesianGrid,
+	Legend,
 	Scatter,
 	ScatterChart,
 	XAxis,
@@ -206,6 +202,7 @@ const Index = ({ user }: { user: User }) => {
 			<h1>
 				{profile?.first_name} {profile?.last_name}
 			</h1>
+			<h2>PR Finder</h2>
 			<div>
 				<Select
 					onValueChange={(value) =>
@@ -215,7 +212,7 @@ const Index = ({ user }: { user: User }) => {
 					}
 				>
 					<SelectTrigger>
-						<SelectValue placeholder="Pick an Exercise" />
+						<SelectValue placeholder='Pick an Exercise' />
 					</SelectTrigger>
 					<SelectContent>
 						{uniqueExercises.map((exercise) => {
@@ -223,7 +220,7 @@ const Index = ({ user }: { user: User }) => {
 								<SelectItem key={exercise.id} value={exercise.id}>
 									{exercise.name}
 								</SelectItem>
-							);
+							)
 						})}
 					</SelectContent>
 				</Select>
@@ -237,23 +234,26 @@ const Index = ({ user }: { user: User }) => {
 				{chartData && (
 					<ChartContainer
 						config={chartConfig}
-						className="min-h-[200px] w-full mt-5"
+						className='min-h-[200px] w-full mt-5'
 					>
 						<ScatterChart accessibilityLayer data={chartData}>
+							<CartesianGrid strokeDasharray='3 3' />
 							<XAxis
-								dataKey="weight"
+								dataKey='weight'
 								tickLine={false}
 								tickMargin={10}
 								axisLine={false}
+								label={'Weight'}
 							/>
-							<YAxis dataKey="reps" />
-							<Scatter dataKey="reps" fill="var(--color-weight)" radius={4} />
+							<YAxis dataKey='reps' label={'reps'}/>
+							<Scatter dataKey='reps' fill='var(--color-weight)' radius={4} />
+							<Legend />
 						</ScatterChart>
 					</ChartContainer>
 				)}
 			</div>
 		</Page>
-	);
+	)
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
