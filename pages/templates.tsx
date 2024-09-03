@@ -8,6 +8,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover'
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { createFEClient } from "@/utils/supabase/component";
@@ -18,6 +23,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import type { Exercise } from ".";
+import { addExerciseToSupabase } from "@/lib/addExerciseToDB";
 
 export interface Template {
 	id: string;
@@ -116,38 +122,55 @@ export default function PublicPage({ user }: { user: User }) {
 		getAllTemplatesForUser();
 	}, [isSuccess]);
 
+	const handleAddOption = async () => {
+		const newOptionName = (
+			document.getElementById('newExerciseName') as HTMLInputElement
+		).value
+		if (newOptionName.trim()) {
+			const newOption = {
+				id: uuidv4(),
+				name: newOptionName.replace(/\s+/g, '-'),
+			}
+
+			const { error } = await addExerciseToSupabase(newOption.name)
+ 			if (error) {
+				alert('Exercise exists')
+			}
+		}
+	}
+
 	return (
 		<Page>
 			<h1>Templates</h1>
-			<div className="flex justify-between">
-				<div className="flex flex-col">
+			<div className='flex justify-between'>
+				<div className='flex flex-col'>
 					<Input
-						placeholder="Template Name"
+						placeholder='Template Name'
 						value={templateName}
 						onChange={(e) => setTemplateName(e.target.value)}
 					/>
 					{selectedExercises.map((exerciseId, index) => (
-						<div key={index} className="flex items-center space-x-2">
+						<div key={index} className='flex items-center space-x-2'>
 							<Select
 								value={exerciseId}
 								onValueChange={(value) => {
-									const newExercises = [...selectedExercises];
-									newExercises[index] = value;
-									setSelectedExercises(newExercises);
+									const newExercises = [...selectedExercises]
+									newExercises[index] = value
+									setSelectedExercises(newExercises)
 								}}
 							>
-								<SelectTrigger className="w-[180px] mt-5">
-									<SelectValue placeholder="Pick an Exercise" />
+								<SelectTrigger className='w-[180px] mt-5'>
+									<SelectValue placeholder='Pick an Exercise' />
 								</SelectTrigger>
 								<Button
-									variant="ghost"
-									size="icon"
-									className="mt-5"
+									variant='ghost'
+									size='icon'
+									className='mt-5'
 									onClick={() => {
-										handleRemoveExercise(exerciseId);
+										handleRemoveExercise(exerciseId)
 									}}
 								>
-									<i className="bi bi-trash3"></i>
+									<i className='bi bi-trash3'></i>
 								</Button>
 								<SelectContent>
 									{allExercises.map((exercise) => {
@@ -157,37 +180,59 @@ export default function PublicPage({ user }: { user: User }) {
 													{exercise.name}
 												</SelectItem>
 											</>
-										);
+										)
 									})}
 								</SelectContent>
 							</Select>
 						</div>
 					))}
 					<Button
-						variant="outline"
-						onClick={() => handleAddExercise("")}
-						className="w-full my-5"
+						variant='outline'
+						onClick={() => handleAddExercise('')}
+						className='w-full my-5'
 					>
 						Add Exercise
 					</Button>
 				</div>
-				<div className="flex flex-col">
+				<div className='flex flex-col'>
 					<Button
 						className={cn(
-							"transition-colors duration-300",
-							isSuccess && "bg-green-500 hover:bg-green-600",
+							'transition-colors duration-300',
+							isSuccess && 'bg-green-500 hover:bg-green-600',
 						)}
 						onClick={handleCreateTemplate}
 					>
 						Save
 					</Button>
-					<Button className="mt-5" variant="link">
-						<Link href="/viewtemplates">View All Templates</Link>
+					<Button className='mt-5' variant='link'>
+						<Link href='/viewtemplates'>View All Templates</Link>
 					</Button>
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button
+								variant='ghost'
+								size='icon'
+								className='w-full justify-start'
+							>
+								<i className='bi bi-plus-lg'></i>
+								Add New Exercise
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className='w-80'>
+							<div className='flex flex-col space-y-2'>
+								<Input
+									id='newExerciseName'
+									placeholder='New option name'
+									onKeyDown={(e) => e.stopPropagation()}
+								/>
+								<Button onClick={handleAddOption}>Add</Button>
+							</div>
+						</PopoverContent>
+					</Popover>
 				</div>
 			</div>
 		</Page>
-	);
+	)
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
