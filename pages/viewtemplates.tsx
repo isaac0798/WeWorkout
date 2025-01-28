@@ -32,6 +32,8 @@ const defaultTemplate = {
 	exercises: [],
 };
 
+
+
 export default function PublicPage({ user }: { user: User }) {
 	const supabase = createFEClient();
 
@@ -40,6 +42,11 @@ export default function PublicPage({ user }: { user: User }) {
 	>([]);
 
 	const [templates, setTemplates] = useState<Template[]>([]);
+
+	const deleteTemplate = async (id: string) => {
+		await supabase.from("TemplateExercises").delete().eq('template_id', id);
+		await supabase.from("Templates").delete().eq('id', id);
+	}
 
 	useEffect(() => {
 		supabase
@@ -86,6 +93,13 @@ export default function PublicPage({ user }: { user: User }) {
 											<Link href={`/templates/${template.id}`}>
 												Edit Template
 											</Link>
+										</i>
+									</Button>
+									<Button className="w-2/5" variant="ghost" size="icon" onClick={(e) => {
+										deleteTemplate(template.id)
+									}}>
+										<i className="bi bi-trash">
+											Delete Template
 										</i>
 									</Button>
 								</div>
