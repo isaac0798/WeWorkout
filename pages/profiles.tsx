@@ -41,12 +41,6 @@ interface Workout {
 interface Exercise {
 	id: string;
 	name: string;
-	sets: {
-		id: string;
-		weight: number;
-		reps: number;
-		completed: boolean;
-	}[];
 }
 
 const Index = ({ user }: { user: User }) => {
@@ -119,7 +113,7 @@ const Index = ({ user }: { user: User }) => {
 				id: workout.id,
 				name: workout.name,
 				date: workout.date,
-				exercises: workout.WorkoutExercise.map((we) => ({
+				exercises: workout.WorkoutExercise.map((we: any) => ({
 					id: we.Exercise.id,
 					name: we.Exercise.name,
 					sets: we.Sets,
@@ -149,8 +143,7 @@ const Index = ({ user }: { user: User }) => {
 					exerciseSet.add(exercise.id);
 					uniqueExercises.push({
 						id: exercise.id,
-						name: exercise.name,
-						sets: exercise.sets,
+						name: exercise.name
 					});
 				}
 			});
@@ -200,13 +193,8 @@ const Index = ({ user }: { user: User }) => {
 		setChartData(formattedHighestWeightsForExerciseInWorkout)
 	}, [selectedExercise]);
 
-	console.log('unique exercises', uniqueExercises)
-
 	return (
 		<Page>
-			<h1>
-				{profile?.first_name} {profile?.last_name}
-			</h1>
 			<h2>Strength Tracker</h2>
 			<div>
 				<Select
@@ -229,13 +217,6 @@ const Index = ({ user }: { user: User }) => {
 						})}
 					</SelectContent>
 				</Select>
-				{selectedExercise && (
-					<div>
-						{!selectedExercise.sets.length && (
-							<div>No Sets found for this exercise</div>
-						)}
-					</div>
-				)}
 				{chartData && (
 					<ChartContainer
 						config={chartConfig}
@@ -250,7 +231,7 @@ const Index = ({ user }: { user: User }) => {
 								axisLine={false}
 								label={'Date'}
 							/>
-							<YAxis dataKey='weight' label={'Weight'}/>
+							<YAxis dataKey='weight' label={'Weight'} tickMargin={5}/>
 							<Scatter dataKey='reps' fill='var(--color-weight)' radius={4} />
 							<Legend />
 						</ScatterChart>
