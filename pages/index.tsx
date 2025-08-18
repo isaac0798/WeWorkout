@@ -16,7 +16,6 @@ import { Textarea } from "@/components/ui/textarea";
 import addSetToExercise from "@/lib/addSetToExercise";
 import removeExercise from "@/lib/removeExercise";
 import removeSetFromExercise from "@/lib/removeSetFromExercise";
-import handleSave from "@/lib/saveWorkout";
 import updateSet from "@/lib/updateSet";
 import { createFEClient } from "@/utils/supabase/component";
 import { createClient } from "@/utils/supabase/server-props";
@@ -68,8 +67,6 @@ export interface WorkoutData {
 const Index = ({ user }: { user: User }) => {
 	const supabase = createFEClient();
 	const [date, setDate] = useState<Date>(new Date());
-	const renderCounter = useRef(0);
-	renderCounter.current = renderCounter.current + 1;
 
 	const [workout, setWorkout] = useState<WorkoutData>(defaultWorkoutData);
 	const [allExercises, setAllExercises] = useState<
@@ -106,7 +103,7 @@ const Index = ({ user }: { user: User }) => {
 		}
 
 		getAllTemplatesForUser();
-	}, []);
+	}, [user.id, supabase]);
 
 	useEffect(() => {
 		supabase

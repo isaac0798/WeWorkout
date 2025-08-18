@@ -61,7 +61,7 @@ const Index = ({ user }: { user: User }) => {
 	const [uniqueExercises, setUniqueExericses] = useState<Exercise[]>([]);
 	const [selectedExercise, setSelectedExercise] = useState<Exercise>();
 	const [chartData, setChartData] =
-		useState<{ reps: number; weight: number }[]>();
+		useState<{ date: string; weight: string }[]>();
 
 	const chartConfig = {
 		weight: {
@@ -108,17 +108,14 @@ const Index = ({ user }: { user: User }) => {
     `,
 				)
 				.eq("user_id", userId)
-				.order("date", { ascending: false });
+				.order("date", { ascending: true });
 
 			if (error) {
 				console.error("Error fetching workouts:", error);
 				throw error;
 			}
 
-			const newdata: any = data;
-
-			// Restructure the data for easier use
-			const formattedWorkouts = newdata?.map((workout) => ({
+			const formattedWorkouts = data.map((workout) => ({
 				id: workout.id,
 				name: workout.name,
 				date: workout.date,
@@ -167,42 +164,50 @@ const Index = ({ user }: { user: User }) => {
 			return;
 		}
 
-		const highestWeightForRep: { [key: string]: number } =
-			selectedExercise.sets.reduce((acc, set) => {
-				if (set.reps in acc) {
-					if (set.weight > acc[set.reps]) {
-						acc[set.reps] = set.weight;
+		const formattedHighestWeightsForExerciseInWorkout: {
+			date: string
+			weight: string
+		}[] = []
 
-						return acc;
-					}
-				} else {
-					acc[set.reps] = set.weight || 0;
+		workouts.forEach(workout => {
+			let highestWeight = 0;
+
+			workout.exercises.find((exercise) => {
+				if (exercise.id !== selectedExercise.id) {
+					return
 				}
 
-				return acc;
-			}, {});
+				exercise.sets.forEach(set => {
+					if (set.weight > highestWeight && set.completed) {
+						highestWeight = set.weight
+					}
+				});
 
-		const formattedHighestWeightsForReps: { reps: number; weight: number }[] =
-			[];
+			})
 
-		for (const [key, value] of Object.entries(highestWeightForRep)) {
-			formattedHighestWeightsForReps.push({
-				reps: Number(key),
-				weight: value,
-			});
-		}
+			if (!highestWeight) {
+				return;
+			}
 
-		setChartData(
-			formattedHighestWeightsForReps.sort((a, b) => a.weight - b.weight),
-		);
+			formattedHighestWeightsForExerciseInWorkout.push(
+				{
+					date: workout.date,
+					weight: String(highestWeight)
+				}
+			)
+		})
+
+		setChartData(formattedHighestWeightsForExerciseInWorkout)
 	}, [selectedExercise]);
+
+	console.log('unique exercises', uniqueExercises)
 
 	return (
 		<Page>
 			<h1>
 				{profile?.first_name} {profile?.last_name}
 			</h1>
-			<h2>PR Finder</h2>
+			<h2>Strength Tracker</h2>
 			<div>
 				<Select
 					onValueChange={(value) =>
@@ -239,13 +244,13 @@ const Index = ({ user }: { user: User }) => {
 						<ScatterChart accessibilityLayer data={chartData}>
 							<CartesianGrid strokeDasharray='3 3' />
 							<XAxis
-								dataKey='weight'
+								dataKey='date'
 								tickLine={false}
 								tickMargin={10}
 								axisLine={false}
-								label={'Weight'}
+								label={'Date'}
 							/>
-							<YAxis dataKey='reps' label={'reps'}/>
+							<YAxis dataKey='weight' label={'Weight'}/>
 							<Scatter dataKey='reps' fill='var(--color-weight)' radius={4} />
 							<Legend />
 						</ScatterChart>
